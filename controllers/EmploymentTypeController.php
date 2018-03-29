@@ -9,19 +9,18 @@ use yii\web\Response;
 use yii\filters\VerbFilter;
 use app\models\LoginForm;
 use app\models\ContactForm;
-use app\models\Worker;
-use app\models\Position;
+use app\models\Employment_type;
 
-class WorkerController extends Controller
+class EmploymentTypeController extends Controller
 {
     
     public $enableCsrfValidation = false;
     
     private $error = "";
     
-    private $controllerName = "worker";
+    private $controllerName = "employment-type";
     
-    private $primaryKeyName = "worker_id";
+    private $primaryKeyName = "employment_type_id";
     
     private function setError($errorArray) {
         $this->error = implode(", ", $errorArray);
@@ -32,11 +31,7 @@ class WorkerController extends Controller
     }
     
     private function getList() {
-       return Worker::find()->with("position")->all(); 
-    }
-    
-    private function getPositions() {
-       return Position::find()->all(); 
+       return Employment_type::find()->all(); 
     }
     
     public function actionList() {
@@ -57,13 +52,13 @@ class WorkerController extends Controller
                 $this->redirect([$this->controllerName . "/list"]);
             }
         }
-        return $this->render("add", ["error" => $error, "positions" => $this->getPositions()]);
+        return $this->render("add", ["error" => $error]);
     }
     
     public function actionChange() {
         $error = "";
         $id = $_REQUEST[$this->primaryKeyName];
-        $model = Worker::findOne($id);
+        $model = Employment_type::findOne($id);
         if (isset($_REQUEST['submit'])) {
             $paramsArray = $_REQUEST["Model"];
             $ok = $this->change($model, $paramsArray);
@@ -73,22 +68,21 @@ class WorkerController extends Controller
             if ($ok) {
                 $this->redirect([$this->controllerName . "/list"]);
             }
-        }
-        $positions = $this->getPositions();
-        return $this->render("change", ["error" => $error, "model" => $model, "positions" => $positions]);
+        } 
+        return $this->render("change", ["error" => $error, "model" => $model]);
     }
     
     public function actionDelete() {
         $id = $_REQUEST[$this->primaryKeyName];
         if (isset($id)) {
-            $model = Worker::findOne($id);
+            $model = Employment_type::findOne($id);
             $code = $model->delete();
             $this->redirect([$this->controllerName . "/list"]);
         }
     }
     
     private function add($paramsArray) {
-        $model = new Worker();
+        $model = new Employment_type();
         $model->setAttributes($paramsArray, false);
         $ok = $model->save();
         if (!$ok) {
@@ -105,6 +99,5 @@ class WorkerController extends Controller
         }
         return $ok;
     }
-    
-    
+
 }

@@ -1,0 +1,38 @@
+<?php
+     
+use yii\helpers\Url;
+
+$controllerName = "timetable";
+$primaryKeyName = "timetable_id";
+
+$addUrl = Url::to([$controllerName . "/add"]);
+
+?>
+
+<h2>Табели</h2> <br/> <br/>
+<a href="<?= $addUrl ?>" >Добавить </a> <br/><br/>
+
+<table class="table">
+    <tr>
+        <th>Дата</th>
+        <th>Номер</th>
+        <th>Период регистрации</th>
+        <th>Подразделение</th>
+        <th></th>
+        <th></th>
+    </tr>
+    <?php foreach ($list as $elem) {
+        $changeUrl = Url::to([$controllerName . "/change", $primaryKeyName => $elem->$primaryKeyName]);
+        $deleteUrl = Url::to([$controllerName . "/delete", $primaryKeyName => $elem->$primaryKeyName]);
+        ?>
+    <tr>
+        <td> </td>
+        <td> </td>
+        <td> </td>
+        <td> </td>
+        <td> <a href="<?= $changeUrl ?>">Изменить</a> </td>
+        <td> <a onclick="return confirm('Подтвердите удаление')" href="<?= $deleteUrl ?>">Удалить</a> </td>
+    </tr>
+    <?php } ?>
+</table>
+

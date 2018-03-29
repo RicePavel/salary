@@ -21,6 +21,9 @@ AppAsset::register($this);
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <?= Html::csrfMetaTags() ?>
     <title><?= Html::encode($this->title) ?></title>
+    
+    <link rel="stylesheet" type="text/css" href="web/bootstrap-3.3.7-dist/bootstrap.min.css">
+    
     <?php $this->head() ?>
 </head>
 <body>
@@ -38,6 +41,14 @@ AppAsset::register($this);
     echo Nav::widget([
         'options' => ['class' => 'navbar-nav navbar-right'],
         'items' => [
+            ['label' => 'Табели', 'url' => ['timetable/list']],
+            ['label' => 'Сотрудники', 'url' => ['worker/list']],
+            ['label' => 'Должности', 'url' => ['position/list']],
+            ['label' => 'Подразделения', 'url' => ['unit/list']],
+            ['label' => 'Виды занятости', 'url' => ['employment-type/list']]
+        ],
+        /*
+        'items' => [
             ['label' => 'Home', 'url' => ['/site/index']],
             ['label' => 'About', 'url' => ['/site/about']],
             ['label' => 'Contact', 'url' => ['/site/contact']],
@@ -54,6 +65,7 @@ AppAsset::register($this);
                 . '</li>'
             )
         ],
+        */
     ]);
     NavBar::end();
     ?>
