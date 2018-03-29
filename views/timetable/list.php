@@ -15,7 +15,6 @@ $addUrl = Url::to([$controllerName . "/add"]);
 <table class="table">
     <tr>
         <th>Дата</th>
-        <th>Номер</th>
         <th>Период регистрации</th>
         <th>Подразделение</th>
         <th></th>
@@ -26,10 +25,9 @@ $addUrl = Url::to([$controllerName . "/add"]);
         $deleteUrl = Url::to([$controllerName . "/delete", $primaryKeyName => $elem->$primaryKeyName]);
         ?>
     <tr>
-        <td> </td>
-        <td> </td>
-        <td> </td>
-        <td> </td>
+        <td> <?= $elem->create_date ?> </td>
+        <td> <?= $months[$elem->month] ?> <?= $elem->year ?> </td>
+        <td> <?= $elem->unit->name ?>  </td>
         <td> <a href="<?= $changeUrl ?>">Изменить</a> </td>
         <td> <a onclick="return confirm('Подтвердите удаление')" href="<?= $deleteUrl ?>">Удалить</a> </td>
     </tr>

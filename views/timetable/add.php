@@ -7,18 +7,19 @@ $primaryKeyName = "timetable_id";
 
 $addUrl = Url::to([$controllerName . "/add"]);
 
-
+$createDate = (isset($_REQUEST["Model[create_date]"]) ? $_REQUEST["Model[create_date]"] : $currentDate);
 
 ?>
+
+<div ng-controller="timetableController">
 
 <div> <?= $error ?> </div>
 
 <form action="<?= $addUrl ?>" method="POST" >
-    Дата: <input type="text" name="Model[create_date]" value="<?= $_REQUEST["Model[create_date]"] ?>" required /> <br/><br/>
-    Номер: <input type="text" name="Model[number]" value="<?= $_REQUEST["Model[number]"] ?>" required /> <br/><br/>
+    Дата: <input type="text" class="dateInput" name="Model[create_date]" value="<?= $createDate?>" required /> <br/><br/>
     
     Месяц:
-    <select name="Model[month]" required>
+    <select name="Model[month]" required  class="monthSelect" >
         <?php foreach ($months as $monthNumber => $month) { ?>
         <option value="<?= $monthNumber ?>"
                 
@@ -29,9 +30,9 @@ $addUrl = Url::to([$controllerName . "/add"]);
     </select>
     
     Год:
-    <select name="Model[year]" required>
+    <select name="Model[year]" required  class="yearSelect" >
         <?php foreach ($years as $year) { ?>
-        <option value="<?= $yearNumber ?>"
+        <option value="<?= $year ?>"
                 
                 <?php if ($year === $currentYear) { echo 'selected'; } ?>
                 
@@ -48,3 +49,13 @@ $addUrl = Url::to([$controllerName . "/add"]);
     </select> <br/> <br/>
     <input type="submit" name="submit" value="Добавить" />
 </form>
+
+<br/> <br/>
+
+<table class="table table-bordered">
+    <tr>
+        <td ng-repeat="day in days" ng-class="(day.holiday) ? 'holiday' : '' ">{{day.dayOfMonth}}&nbsp;{{day.dayOfWeekName}}</td>
+    </tr>
+</table>
+
+</div>

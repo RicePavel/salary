@@ -22,13 +22,34 @@ AppAsset::register($this);
     <?= Html::csrfMetaTags() ?>
     <title><?= Html::encode($this->title) ?></title>
     
-    <link rel="stylesheet" type="text/css" href="web/bootstrap-3.3.7-dist/bootstrap.min.css">
+     <script type="text/javascript" src="http://code.jquery.com/jquery-2.1.3.min.js"></script> 
     
-    <?php $this->head() ?>
+    <link rel="stylesheet" type="text/css" href="bootstrap-3.3.7-dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/my.css">
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    
+    <script src="js/my.js"></script>
+    
+    <script src="js/angular.min.js"></script>    
+    
+    <script src="js/angular_app/main.js" ></script>
+    <script src="js/angular_app/controllers/timetable.js"></script>
+    
+    <script>
+  $( function() {
+    $( "#datepicker" ).datepicker();
+  } );
+  </script>
+    
+    <?php  $this->head()  ?>
 </head>
 <body>
 <?php $this->beginBody() ?>
 
+    
+    
 <div class="wrap">
     <?php
     NavBar::begin([
@@ -70,15 +91,17 @@ AppAsset::register($this);
     NavBar::end();
     ?>
 
-    <div class="container">
+    <div class="container" ng-app="myApp" >
         <?= Breadcrumbs::widget([
             'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
         ]) ?>
         <?= Alert::widget() ?>
+        
         <?= $content ?>
     </div>
 </div>
 
+<!-- 
 <footer class="footer">
     <div class="container">
         <p class="pull-left">&copy; My Company <?= date('Y') ?></p>
@@ -86,8 +109,9 @@ AppAsset::register($this);
         <p class="pull-right"><?= Yii::powered() ?></p>
     </div>
 </footer>
+-->
 
-<?php $this->endBody() ?>
+ <?php /* $this->endBody() */ ?> 
 </body>
 </html>
 <?php $this->endPage() ?>

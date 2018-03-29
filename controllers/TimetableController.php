@@ -11,6 +11,7 @@ use app\models\LoginForm;
 use app\models\ContactForm;
 use app\models\Unit;
 use app\models\Timetable;
+use app\helpers\DateFormat;
 
 class TimetableController extends Controller
 {
@@ -32,7 +33,7 @@ class TimetableController extends Controller
     }
     
     private function getList() {
-       return Timetable::find()->all(); 
+       return Timetable::find()->with('unit')->all(); 
     }
     
     private function getMonths() {
@@ -67,13 +68,20 @@ class TimetableController extends Controller
         return $years;
     }
     
+    private function getCurrentDateInWebFormat() {
+        return date('d.m.Y');
+    }
+    
     private function getCurrentYear() {
         return getdate()["year"];
     }
     
     public function actionList() {
         $list = $this->getList(); 
-        return $this->render("list", ["list" => $list, "units" => $this->getUnits()]);
+        foreach ($list as $model) {
+            $this->beforeOutput($model);
+        }
+        return $this->render("list", ["list" => $list, "units" => $this->getUnits(), "months" => $this->getMonths()]);
     }
     
     private function getUnits() {
@@ -94,7 +102,8 @@ class TimetableController extends Controller
             }
         }
         return $this->render("add", ["error" => $error, "years" => $this->getYears(), "currentYear" => $this->getCurrentYear(),
-            "months" => $this->getMonths(), "currentMonth" => $this->getCurrentMonth(), "units" => $this->getUnits()]);
+            "months" => $this->getMonths(), "currentMonth" => $this->getCurrentMonth(), "units" => $this->getUnits(),
+            "currentDate" => $this->getCurrentDateInWebFormat()]);
     }
     
     public function actionChange() {
@@ -111,7 +120,9 @@ class TimetableController extends Controller
                 $this->redirect([$this->controllerName . "/list"]);
             }
         } 
-        return $this->render("change", ["error" => $error, "model" => $model]);
+        $this->beforeOutput($model);
+        return $this->render("change", ["error" => $error, "model" => $model, "years" => $this->getYears(), "months" => $this->getMonths(),
+               "units" => $this->getUnits()]);
     }
     
     public function actionDelete() {
@@ -126,6 +137,7 @@ class TimetableController extends Controller
     private function add($paramsArray) {
         $model = new Timetable();
         $model->setAttributes($paramsArray, false);
+        $this->beforeSave($model);
         $ok = $model->save();
         if (!$ok) {
             $this->setError($model->getErrorSummary(true));
@@ -135,11 +147,24 @@ class TimetableController extends Controller
     
     private function change($model, $paramsArray) {
         $model->setAttributes($paramsArray, false);
+        $this->beforeSave($model);
         $ok = $model->save();
         if (!$ok) {
             $this->setError($model->getErrorSummary(true));
         }
         return $ok;
+    }
+    
+    private function beforeSave($model) {
+       if ($model->create_date) {
+           $model->create_date = DateFormat::toSqlFormat($model->create_date);
+       } 
+    }
+    
+    private function beforeOutput($model) {
+        if ($model->create_date) {
+            $model->create_date = DateFormat::toWebFormat($model->create_date);
+        }
     }
 
 }
