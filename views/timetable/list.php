@@ -5,7 +5,7 @@ use yii\helpers\Url;
 $controllerName = "timetable";
 $primaryKeyName = "timetable_id";
 
-$addUrl = Url::to([$controllerName . "/add"]);
+$addUrl = Url::to([$controllerName . "/add", 'type' => 'showAddAjaxForm']);
 
 ?>
 

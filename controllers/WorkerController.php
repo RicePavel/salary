@@ -11,6 +11,7 @@ use app\models\LoginForm;
 use app\models\ContactForm;
 use app\models\Worker;
 use app\models\Position;
+use yii\helpers\BaseJson;
 
 class WorkerController extends Controller
 {
@@ -39,9 +40,26 @@ class WorkerController extends Controller
        return Position::find()->all(); 
     }
     
+    private function sendInJson($data) {
+        $json = BaseJson::encode($data);
+        $res = Yii::$app->getResponse();
+        $res->format = Response::FORMAT_JSON;
+        $res->data = $json;
+        $res->send();
+    }
+    
     public function actionList() {
-        $list = $this->getList(); 
-        return $this->render("list", ["list" => $list]);
+        $type = '';
+        if (isset($_REQUEST['type'])) {
+            $type = $_REQUEST['type'];
+        }
+        if ($type === 'json') {
+            $list = $this->getList();
+            $this->sendInJson($list);
+        } else {
+            $list = $this->getList(); 
+            return $this->render("list", ["list" => $list]);
+        }
     }
     
     public function actionAdd() {

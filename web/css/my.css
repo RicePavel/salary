@@ -8,3 +8,38 @@ body {
     color: red;
 }
 
+.timetable-table-1 {
+    float:left;
+    width: auto;
+    position: absolute;
+    z-index: 1000;
+    background-color: white;
+}
+
+.timetable-table-1 .worker-column {
+    width: 400px;
+}
+
+.timetable-table-1 .total-column {
+    width: 100px;
+}
+
+.timetable-table-2 {
+    margin-left: 500px;
+}
+
+.timetable-table-1 td, .timetable-table-2 td {
+    padding: 5px !important;
+    height: 35px;
+}
+
+.tableContainer {
+    width: 1300px;
+    overflow-x: scroll;
+    min-height: 300px;
+    margin-top: 20px;
+}
+
+.timetableDeleteButton {
+    float: right;
+}

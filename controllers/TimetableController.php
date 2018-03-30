@@ -12,6 +12,7 @@ use app\models\ContactForm;
 use app\models\Unit;
 use app\models\Timetable;
 use app\helpers\DateFormat;
+use yii\helpers\BaseJson;
 
 class TimetableController extends Controller
 {
@@ -76,6 +77,14 @@ class TimetableController extends Controller
         return getdate()["year"];
     }
     
+    private function sendInJson($data) {
+        $json = BaseJson::encode($data);
+        $res = Yii::$app->getResponse();
+        $res->format = Response::FORMAT_JSON;
+        $res->data = $json;
+        $res->send();
+    }
+    
     public function actionList() {
         $list = $this->getList(); 
         foreach ($list as $model) {
@@ -90,6 +99,13 @@ class TimetableController extends Controller
     
     public function actionAdd() {
         $error = "";
+        $type = '';
+        if (isset($_REQUEST['type'])) {
+            $type = $_REQUEST['type'];
+        }
+        if ($type == 'showAddAjaxForm') {
+            return $this->render("add");
+        } else {
         if (isset($_REQUEST['submit'])) {
             $name = $_REQUEST['name'];
             $paramsArray = $_REQUEST['Model'];
@@ -104,6 +120,15 @@ class TimetableController extends Controller
         return $this->render("add", ["error" => $error, "years" => $this->getYears(), "currentYear" => $this->getCurrentYear(),
             "months" => $this->getMonths(), "currentMonth" => $this->getCurrentMonth(), "units" => $this->getUnits(),
             "currentDate" => $this->getCurrentDateInWebFormat()]);
+        }
+    }
+    
+    public function actionAdd_info() {
+        $error = "";
+        $result = ["years" => $this->getYears(), "currentYear" => $this->getCurrentYear(),
+            "months" => $this->getMonths(), "currentMonth" => $this->getCurrentMonth(), "units" => $this->getUnits(),
+            "currentDate" => $this->getCurrentDateInWebFormat()];
+        $this->sendInJson($result);
     }
     
     public function actionChange() {
