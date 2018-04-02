@@ -33,7 +33,8 @@ AppAsset::register($this);
     
     <script src="js/my.js"></script>
     
-    <script src="js/angular.min.js"></script>    
+    <script src="js/angular.min.js"></script>  
+    <script src="js/jquery.json.js"></script>
     
     <script src="js/angular_app/main.js" ></script>
     <script src="js/angular_app/controllers/timetable.js"></script>

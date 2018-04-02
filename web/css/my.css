@@ -12,12 +12,15 @@ body {
     float:left;
     width: auto;
     position: absolute;
-    z-index: 1000;
     background-color: white;
 }
 
+.timetable-table-1 .number-column {
+    width: 20px;
+}
+
 .timetable-table-1 .worker-column {
-    width: 400px;
+    width: 380px;
 }
 
 .timetable-table-1 .total-column {
@@ -33,6 +36,16 @@ body {
     height: 35px;
 }
 
+.timetable-table-2 {
+    width: auto !important;
+    table-layout: fixed !important;
+}
+
+.timetable-table-2 td {
+    width: 90px;
+    position: relative;
+}
+
 .tableContainer {
     width: 1300px;
     overflow-x: scroll;
@@ -40,6 +53,39 @@ body {
     margin-top: 20px;
 }
 
+.secondTableContainer {
+    width: 3500px;
+}
+
 .timetableDeleteButton {
     float: right;
+}
+
+/* */
+
+.dayCellInput {
+    width: 80px;
+    /* display: none; */
+}
+
+.employmentTypesList {
+    min-width: 200px;
+    padding-left: 0;
+    position: absolute;
+    border: 1px solid black;
+    top: 30px;
+    /* display: none; */
+    z-index:10;
+    background-color: white;
+}
+
+.employmentTypesList li {
+    list-style-type: none;
+    cursor: pointer;
+    margin-left: 0;
+    padding-left: 0;
+}
+
+.employmentTypesList li:hover {
+    background-color: #F4FF77;
 }

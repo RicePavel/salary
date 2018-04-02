@@ -57,26 +57,27 @@ $createDate = (isset($_REQUEST["Model[create_date]"]) ? $_REQUEST["Model[create_
 <br/> 
 
 
-<form>
-    <button type="button" class="btn btn-primary">Сохранить</button>
+<form ng-submit="save()">
+    <!-- <button type="button" class="btn btn-primary" >Сохранить</button> -->
+    <input type="submit" class="btn btn-primary" value="Сохранить" />
     <br/>
     <br/>
     Дата: <input type="text" class="dateInput" name="Model[create_date]" ng-model="timetableModel.create_date" required /> <br/><br/>
     
     Месяц:
-    <select name="Model[month]" required  class="monthSelect" ng-model="timetableModel.month" >
-        <option ng-repeat="month in months" value="{{month.number}}" >{{month.name}}</option>
+    <select name="Model[month]" required  class="monthSelect" ng-model="timetableModel.month" ng-change="updateDays()" >
+        <option ng-repeat="(key, month) in months" value="{{key}}" >{{month}}</option>
     </select>
     
     Год:
-    <select name="Model[year]" required  class="yearSelect" ng-model="timetableModel.year" >
+    <select name="Model[year]" required  class="yearSelect" ng-model="timetableModel.year" ng-change="updateDays()" >
         <option ng-repeat='year in years' value='{{year}}' >{{year}}</option>
     </select>
     <br/><br/>
     
     Подразделение: 
     <select name="Model[unit_id]" required ng-model="timetableModel.unit_id" >
-        <option ng-repeat='unit in inits' value='{{unit.unit_id}}' >{{unit.name}}</option>
+        <option ng-repeat='unit in units' value='{{unit.unit_id}}' >{{unit.name}}</option>
     </select> <br/> <br/>
     <!-- <input type="submit" name="submit" value="Добавить" /> -->
 </form>

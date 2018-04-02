@@ -21,14 +21,14 @@ $addUrl = Url::to([$controllerName . "/add", 'type' => 'showAddAjaxForm']);
         <th></th>
     </tr>
     <?php foreach ($list as $elem) {
-        $changeUrl = Url::to([$controllerName . "/change", $primaryKeyName => $elem->$primaryKeyName]);
+        $changeUrl = Url::to([$controllerName . "/change", $primaryKeyName => $elem->$primaryKeyName, 'type' => 'showAjaxForm']);
         $deleteUrl = Url::to([$controllerName . "/delete", $primaryKeyName => $elem->$primaryKeyName]);
         ?>
     <tr>
         <td> <?= $elem->create_date ?> </td>
         <td> <?= $months[$elem->month] ?> <?= $elem->year ?> </td>
         <td> <?= $elem->unit->name ?>  </td>
-        <td> <a href="<?= $changeUrl ?>">Изменить</a> </td>
+        <td> <a href="<?= $changeUrl ?>">Открыть</a> </td>
         <td> <a onclick="return confirm('Подтвердите удаление')" href="<?= $deleteUrl ?>">Удалить</a> </td>
     </tr>
     <?php } ?>

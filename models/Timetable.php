@@ -7,6 +7,12 @@ use app\helpers\DateFormat;
 
 class Timetable extends ActiveRecord {
     
+    public function rules() {
+        return [
+            ['unit_id', 'required', 'message' => 'подразделение должно быть задано']
+        ];
+    }
+    
     public function getUnit() {
         return $this->hasOne(Unit::className(), ['unit_id' => 'unit_id']);
     }
