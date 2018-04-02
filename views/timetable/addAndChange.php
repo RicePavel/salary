@@ -7,13 +7,13 @@ $primaryKeyName = "timetable_id";
 
 $addUrl = Url::to([$controllerName . "/add"]);
 
-$createDate = (isset($_REQUEST["Model[create_date]"]) ? $_REQUEST["Model[create_date]"] : $currentDate);
+//$createDate = (isset($_REQUEST["Model[create_date]"]) ? $_REQUEST["Model[create_date]"] : $currentDate);
 
 ?>
 
 <div ng-controller="timetableController">
 
-<div> <?= $error ?> </div>
+
 
 
 <br/> 

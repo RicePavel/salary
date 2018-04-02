@@ -185,6 +185,7 @@ class TimetableController extends Controller
             $this->sendInJson($result);
         } else if ($type == 'byAjax') {
             // изменить по ajax-запросу
+            $error = '';
             $paramsArray = $_REQUEST['Model'];
             $id = $paramsArray[$this->primaryKeyName];
             $model = Timetable::findOne($id);
