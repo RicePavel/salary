@@ -6,6 +6,7 @@ $controllerName = "timetable";
 $primaryKeyName = "timetable_id";
 
 $addUrl = Url::to([$controllerName . "/add"]);
+$listUrl = Url::to([$controllerName .  "/list"]);
 
 //$createDate = (isset($_REQUEST["Model[create_date]"]) ? $_REQUEST["Model[create_date]"] : $currentDate);
 
@@ -40,7 +41,8 @@ $addUrl = Url::to([$controllerName . "/add"]);
         <option ng-repeat='unit in units' value='{{unit.unit_id}}' >{{unit.name}}</option>
     </select> <br/> <br/> 
     
-    <input type="submit" class="btn btn-primary" value="Сохранить" />
+    <input type="submit" class="btn btn-primary" value="Сохранить" /> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <a class="btn btn-default" href="<?= $listUrl ?>" >Отмена</a>
     <!-- <input type="submit" name="submit" value="Добавить" /> -->
 </form>
 
@@ -63,7 +65,7 @@ $addUrl = Url::to([$controllerName . "/add"]);
                 <td>{{timetableWorker.fio}}
                     <button ng-click="deleteTimetableWorker($index)" type="button" class="btn btn-default btn-xs timetableDeleteButton" > <span class="glyphicon glyphicon-remove"></span> </button>
                 </td>
-                <td></td>
+                <td title="тест &#10 тест"></td>
             </tr>
         </table>
         <table class="table table-bordered timetable-table-2">

@@ -471,3 +471,54 @@ myApp.controller('timetableController', function($scope, $http, $timeout) {
 });
 
 
+function DaysInfo(daysInfoArray) {
+    
+    
+    
+    this.getTotalText = function(totalArray) {
+        
+    }
+    
+    this.getTotalTextFirstLine = function(totalArray) {
+        
+    }
+    
+    
+     /*
+     * 
+     * @type Array
+     * 
+     * [
+     *    -rowNumber- : {
+     *       timetable_worker_id : ,
+     *       days: {
+     *          -dayNumber- : {
+     *              time: ,
+     *              employment_type_id: ,
+     *              employment_type_short_name
+     *          }
+     *       }
+     *    }
+     * ]
+     * 
+     */
+    
+    function getTotalObject(rowNumber) {
+        var totalObject = {};
+        if (daysInfoArray[rowNumber] && daysInfoArray[rowNumber]['days']) {
+            var days = daysInfoArray[rowNumber]['days'];
+            for (var key in days) {
+                var dayObject = days[key];
+                var shortName = dayObject.employment_type_short_name;
+                var time = Number(dayObject.time);
+                if (!(shortName in totalObject)) {
+                    totalObject.shortName = 0;
+                }
+                totalObject.shortName += time;
+            }
+        }
+    }
+    
+}
+
+

@@ -12,7 +12,7 @@ use app\models\ContactForm;
 use app\models\Unit;
 use app\models\Timetable;
 use app\models\Timetable_worker;
-use app\models\Timetable_element;
+use app\models\Day_info;
 use app\models\Employment_type;
 use app\helpers\DateFormat;
 use yii\helpers\BaseJson;
@@ -111,30 +111,46 @@ class TimetableController extends Controller
             $type = $_REQUEST['type'];
         }
         if ($type == 'showAddAjaxForm') {
+            // просто показать форму
             return $this->render("addAndChange");
         } else if ($type == 'addByAjax') {
-            $paramsArray = $_REQUEST['Model'];
-            $timetableWorkerArray = [];
-            if (isset($_REQUEST['timetableWorkerArray'])) {
-                $timetableWorkerArray = BaseJson::decode($_REQUEST['timetableWorkerArray']);
-                if (!is_array($timetableWorkerArray)) {
-                    $timetableWorkerArray = [];
+            // добавить по ajax запросу
+            $ok = true;
+            $transaction = Yii::$app->db->beginTransaction();
+            try {
+                $paramsArray = $_REQUEST['Model'];
+                $timetableWorkerArray = [];
+                if (isset($_REQUEST['timetableWorkerArray'])) {
+                    $timetableWorkerArray = BaseJson::decode($_REQUEST['timetableWorkerArray']);
+                    if (!is_array($timetableWorkerArray)) {
+                        $timetableWorkerArray = [];
+                    }
                 }
-            }
-            $daysInfoArray = [];
-            if (isset($_REQUEST['daysInfoArray'])) {
-                $daysInfoArray = BaseJson::decode($_REQUEST['daysInfoArray']);
-                if (!is_array($daysInfoArray)) {
-                    $daysInfoArray = [];
+                $daysInfoArray = [];
+                if (isset($_REQUEST['daysInfoArray'])) {
+                    $daysInfoArray = BaseJson::decode($_REQUEST['daysInfoArray']);
+                    if (!is_array($daysInfoArray)) {
+                        $daysInfoArray = [];
+                    }
                 }
+                $ok = $this->add($paramsArray, $timetableWorkerArray, $daysInfoArray);
+                
+            } catch (Exception $e) {
+                $transaction->rollBack();
+                throw $e;
             }
-            $ok = $this->add($paramsArray, $timetableWorkerArray, $daysInfoArray);
+            if ($ok) {
+                $transaction->commit();
+            } else {
+                $transaction->rollBack();
+            }
             if (!$ok) {
-                $error = $this->getError();
+                    $error = $this->getError();
             }
             $result = ['ok' => $ok, 'error' => $error];
             $this->sendInJson($result);
         } else {
+            // добавить по обычному get-запросу
             if (isset($_REQUEST['submit'])) {
                 $paramsArray = $_REQUEST['Model'];
                 $ok = $this->add($paramsArray);
@@ -198,25 +214,37 @@ class TimetableController extends Controller
             $this->sendInJson($result);
         } else if ($type == 'byAjax') {
             // изменить по ajax-запросу
+            $transaction = Yii::$app->db->beginTransaction();
+            $ok = true;
             $error = '';
-            $paramsArray = $_REQUEST['Model'];
-            $id = $paramsArray[$this->primaryKeyName];
-            $model = Timetable::findOne($id);
-            $ok = $this->change($model, $paramsArray);
-            if ($ok) {
-                if (isset($_REQUEST['timetableWorkerArray'])) {
-                    $timetableWorkerArray = BaseJson::decode($_REQUEST['timetableWorkerArray']);
-                    $daysInfoArray = [];
-                    if (isset($_REQUEST['daysInfoArray'])) {
-                        $daysInfoArray = BaseJson::decode($_REQUEST['daysInfoArray']);
-                        if (!is_array($daysInfoArray)) {
-                            $daysInfoArray = [];
+            try {
+                $paramsArray = $_REQUEST['Model'];
+                $id = $paramsArray[$this->primaryKeyName];
+                $model = Timetable::findOne($id);
+                $ok = $this->change($model, $paramsArray);
+                if ($ok) {
+                    if (isset($_REQUEST['timetableWorkerArray'])) {
+                        $timetableWorkerArray = BaseJson::decode($_REQUEST['timetableWorkerArray']);
+                        $daysInfoArray = [];
+                        if (isset($_REQUEST['daysInfoArray'])) {
+                            $daysInfoArray = BaseJson::decode($_REQUEST['daysInfoArray']);
+                            if (!is_array($daysInfoArray)) {
+                                $daysInfoArray = [];
+                            }
+                        }
+                        if (is_array($timetableWorkerArray)) {
+                            $this->updateTimetableInformation($id, $timetableWorkerArray, $daysInfoArray);
                         }
                     }
-                    if (is_array($timetableWorkerArray)) {
-                        $this->updateTimetableInformation($id, $timetableWorkerArray, $daysInfoArray);
-                    }
                 }
+            } catch (Exception $e) {
+                $transaction->rollBack();
+                throw $e;
+            }
+            if ($ok) {
+                $transaction->commit();
+            } else {
+                $transaction->rollBack();
             }
             if (!$ok) {
                 $error = $this->getError();
@@ -246,7 +274,7 @@ class TimetableController extends Controller
     
     private function getDaysInfoArray($timetableId) {
         $daysInfoArray = [];
-        $timetableModel = Timetable::find()->where(['timetable_id' => $timetableId])->with('timetable_workers.timetable_elements.employment_type')->one();
+        $timetableModel = Timetable::find()->where(['timetable_id' => $timetableId])->with('timetable_workers.days_info.employment_type')->one();
         foreach ($timetableModel->timetable_workers as $timetable_worker) {
             $number = $timetable_worker->number;
             $arrayRowNumber = $number - 1;
@@ -254,7 +282,7 @@ class TimetableController extends Controller
                 'timetable_worker_id' => $timetable_worker->timetable_worker_id,
                 'days' => []
             ];
-            foreach ($timetable_worker->timetable_elements as $element) {
+            foreach ($timetable_worker->days_info as $element) {
                 $day = $element->day;
                 $daysInfoArray[$arrayRowNumber]['days'][$day] = [
                     'time' => $element->time,
@@ -377,7 +405,7 @@ class TimetableController extends Controller
                     $time = isset($elem['time']) ? $elem['time'] : null;
                     if (isset($elem['employment_type_id'])) {
                         $employment_type_id = $elem['employment_type_id'];
-                        $model = new Timetable_element();
+                        $model = new Day_info();
                         $model->day = $dayNumber;
                         $model->time = $time;
                         $model->timetable_worker_id = $timetableWorkerId;
@@ -396,7 +424,7 @@ class TimetableController extends Controller
     
     private function deleteDaysInfoRow($timetableWorkerId) {
         $conn = Yii::$app->db;
-        $command = $conn->createCommand('delete from timetable_element where timetable_worker_id = :timetable_worker_id ', ['timetable_worker_id' => $timetableWorkerId]);
+        $command = $conn->createCommand('delete from day_info where timetable_worker_id = :timetable_worker_id ', ['timetable_worker_id' => $timetableWorkerId]);
         $command->execute();
     }
     
