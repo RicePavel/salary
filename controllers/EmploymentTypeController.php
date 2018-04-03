@@ -42,7 +42,6 @@ class EmploymentTypeController extends Controller
     public function actionAdd() {
         $error = "";
         if (isset($_REQUEST['submit'])) {
-            $name = $_REQUEST['name'];
             $paramsArray = $_REQUEST['Model'];
             $ok = $this->add($paramsArray);
             if (!$ok) {

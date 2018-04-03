@@ -12,8 +12,8 @@ $addUrl = Url::to([$controllerName . "/add"]);
 <div> <?= $error ?> </div>
 
 <form action="<?= $addUrl ?>" method="POST" >
-    ФИО: <input type="text" name="Model[fio]" value="<?= $_REQUEST["Model[name]"] ?>" required /> <br/> 
-    Табельный номер: <input type="text" name="Model[person_number]" value="<?= $_REQUEST["Model[person_number]"] ?>" required /> <br/> 
+    ФИО: <input type="text" name="Model[fio]" value="<?= isset($_REQUEST["Model[name]"]) ? $_REQUEST["Model[name]"] : '' ?>" required /> <br/> 
+    Табельный номер: <input type="text" name="Model[person_number]" value="<?= isset($_REQUEST["Model[person_number]"]) ? $_REQUEST["Model[person_number]"] : '' ?>" required /> <br/> 
     Должность: 
     <select name="Model[position_id]" required >
         <?php foreach ($positions as $position) { ?>

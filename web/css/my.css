@@ -13,6 +13,7 @@ body {
     width: auto;
     position: absolute;
     background-color: white;
+    z-index: 100;
 }
 
 .timetable-table-1 .number-column {
@@ -28,7 +29,7 @@ body {
 }
 
 .timetable-table-2 {
-    margin-left: 500px;
+    margin-left: 505px;
 }
 
 .timetable-table-1 td, .timetable-table-2 td {

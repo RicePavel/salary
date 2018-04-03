@@ -71,12 +71,14 @@ $addUrl = Url::to([$controllerName . "/add"]);
                 <td ng-repeat="day in days" ng-class="(day.holiday) ? 'holiday' : '' ">{{day.dayOfMonth}}&nbsp;{{day.dayOfWeekName}}</td>
             </tr>
             <tr ng-repeat="timetableWorker in timetableWorkerArray">
-                <td class="dayCell" ng-repeat="day in days" ng-dblclick="editCell(($parent.$index + 1), day.dayOfMonth, $event)">
-                    <div class="dayCellDiv"></div>
-                    <input class="dayCellInput" type="text" ng-show="cellEdited(($parent.$index + 1), day.dayOfMonth)"/>
-                    <ul class="employmentTypesList" ng-show="cellEdited(($parent.$index + 1), day.dayOfMonth)" >
+                <td class="dayCell" ng-repeat="day in days" ng-dblclick="editCell($parent.$index, day.dayOfMonth, $event)">
+                    <div class="dayCellDiv" ng-hide="cellEdited($parent.$index, day.dayOfMonth)" >
+                        {{getTimeTableElementText($parent.$index, day.dayOfMonth)}}
+                    </div>
+                    <input class="dayCellInput" type="text" ng-show="cellEdited($parent.$index, day.dayOfMonth)" ng-model="editableModel.text" />
+                    <ul class="employmentTypesList" ng-show="showEmploymentTypesList($parent.$index, day.dayOfMonth)" >
                         <li class="notFound" ng-show="editableModel.notFoundEmploymentType" >{{editableModel.notFoundText}} не найдено</li>
-                        <li ng-repeat="type in employmentTypes" ng-show="type.show" data-id="{{type.employment_type_id}}" data-name="{{type.name}}">{{type.name}} ({{type.short_name}})</li>
+                        <li ng-repeat="type in employmentTypes" ng-show="type.show" ng-click="selectEmploymentType(type.short_name, $event)" >{{type.name}} ({{type.short_name}})</li>
                     </ul>
                 </td>
             </tr>

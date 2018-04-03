@@ -5,22 +5,27 @@ myApp.controller('timetableController', function($scope, $http, $timeout) {
     $scope.workers = [];
     
     /*
-    {
-                timetable_worker_id: ,
-                worker_id: ,
-                fio: 
-            }
+     * [
+     *    {
+     *       timetable_worker_id: ,
+     *       worker_id: ,
+     *       fio: 
+     *    }
+     *  ]
     */
     $scope.timetableWorkerArray = [];
     $scope.timetableModel = {};
     $scope.years = [];
     $scope.months = [];
+    
     /*
-     {
-        employment_type_id: ,
-        name: ,
-        show: 
-     }
+     * [
+     *    {
+     *       employment_type_id: ,
+     *       name: ,
+     *       show: 
+     *     }
+     *  ]
      */
     $scope.employmentTypes = [];
     
@@ -35,12 +40,34 @@ myApp.controller('timetableController', function($scope, $http, $timeout) {
         day: '',
         
         text: '',
-        employment_type_id: '',
-        time: '',
+        
+        showEmploymentTypesList: false,
         
         notFoundEmploymentType: false,
         notFoundText: ''
     };
+    
+    /* */
+    
+    /*
+     * 
+     * @type Array
+     * 
+     * [
+     *    -rowNumber- : {
+     *       timetable_worker_id : ,
+     *       days: {
+     *          -dayNumber- : {
+     *              time: ,
+     *              employment_type_id: ,
+     *              employment_type_short_name
+     *          }
+     *       }
+     *    }
+     * ]
+     * 
+     */
+    $scope.daysInfoArray = [];
     
     /* */
     
@@ -52,16 +79,6 @@ myApp.controller('timetableController', function($scope, $http, $timeout) {
     } else {
         setDataForChange();
     }
-    
-    $('.monthSelect').change(function() {
-        $scope.days = getDays(getMonth(), getYear());
-        $scope.$apply();
-    });
-    
-    $('.yearSelect').change(function() {
-        $scope.days = getDays(getMonth(), getYear());
-        $scope.$apply();
-    });
     
     $scope.addTimetableWorker = function() {
         var addWorkerId = $scope.workerIdForAdding;
@@ -81,6 +98,7 @@ myApp.controller('timetableController', function($scope, $http, $timeout) {
                 fio: fio
             });
             $('#myModal').modal('hide');
+            getDaysInfoRow();
         } else {
             alert('выберите пользователя!');
         }
@@ -89,6 +107,7 @@ myApp.controller('timetableController', function($scope, $http, $timeout) {
     $scope.deleteTimetableWorker = function(index) {
         if (confirm('подтвердите удаление')) {
             $scope.timetableWorkerArray.splice(index, 1);
+            deleteDaysInfoRow(index);
         }
     };
     
@@ -108,6 +127,7 @@ myApp.controller('timetableController', function($scope, $http, $timeout) {
         }
         var json = $.toJSON($scope.timetableWorkerArray);
         formData.append('timetableWorkerArray', json);
+        formData.append('daysInfoArray', $.toJSON($scope.daysInfoArray));
         $.ajax({
             url: url,
             data: formData,
@@ -126,35 +146,9 @@ myApp.controller('timetableController', function($scope, $http, $timeout) {
         });
     }
     
-    /* */
-    
-    /*
-    $('body').on('dblclick', '.dayCell', function() {
-        var cell = $(this);
-        var input = cell.children('.dayCellInput');
-        var div = cell.children('.dayCellDiv');
-        var list = cell.children('.employmentTypesList');
-        if (!cell.hasClass('edited')) {
-            input.show();
-            input.focus();
-            div.hide();
-            list.show();
-            cell.addClass('edited');
-        }
-    });
-    $('body').on('blur', '.dayCell .dayCellInput', function() {
-        var input = $(this);
-        var cell = input.closest('.dayCell');
-        var div = cell.children('.dayCellDiv');
-        var list = cell.children('.employmentTypesList');
-        if (cell.hasClass('edited')) {
-            input.hide();
-            div.show();
-            list.hide();
-            cell.removeClass('edited');
-        }
-    });
-    */
+    /* ------------------------------------- */
+    /* ------------------------------------- */
+    /* функции редактирования ячейки таблицы */
    
     $scope.cellEdited = function(rowNumber, day) {
         if ($scope.editableModel.nowEdited === true 
@@ -166,8 +160,8 @@ myApp.controller('timetableController', function($scope, $http, $timeout) {
         }
     }
     
-    $scope.showEmploymentTypesList = function() {
-        
+    $scope.showEmploymentTypesList = function(rowNumber, day) {
+        return ($scope.cellEdited(rowNumber, day) && $scope.editableModel.showEmploymentTypesList);
     }
     
     $scope.editCell = function(rowNumber, day, event) {
@@ -177,58 +171,59 @@ myApp.controller('timetableController', function($scope, $http, $timeout) {
         for (var i = 0; i < $scope.employmentTypes.length; i++) {
             $scope.employmentTypes[i].show = true;
         }
-        var td = $(event.target);
+        $scope.editableModel.showEmploymentTypesList = true;
+        $scope.editableModel.text = getDaysInfoElementText(rowNumber, day);
+        filterEmploymentTypeList($scope.editableModel.text);
+        var td = $(event.currentTarget);
         var input = td.children('input');
         td.addClass('edited');
-        input.addClass('test');
         $timeout(function() {input.focus(); });
-        $(document).click(function(event) {
+        var onEndEdit = function(event) {
             var target = $(event.target);
             var parent = target.closest('.edited');
             if (!target.hasClass('edited') && parent.length == 0) {
                 endEditCell();
+                $(document).off('click', onEndEdit);
             }
-        });
+        }
+        $(document).click(onEndEdit);
     }
     
+    // обработчик ввода в поле
     $('body').on('input', '.dayCellInput', function(event) {
         onChangeCellValue(event);
     });
     
-    function onChangeCellValue(event) {      
-        var input = $(event.target);
-        var value = input.val().trim();
-        
-        var shortName = '';
-        var count = undefined;
-        
-        var a = value.split(' ');
-        var arr = [];
-        for (var i = 0; i < a.length; i++) {
-            if (a[i] !== '') {
-                arr.push(a[i]);
-            }
+    $scope.selectEmploymentType = function(shortName, event) {
+        var text = $scope.editableModel.text;
+        var obj = parseInputValue(text);
+        var newText = shortName + ' ';
+        if (obj.time !== undefined) {
+            newText += obj.time;
         }
-        if (arr.length === 0) {
-            
-        } else if (arr.length === 1) {
-            var elem = arr[0];
-            if (isNumeric(elem)) {
-                count = Number(elem);
-            } else {
-                shortName = elem;
-            }
-        } else if (arr.length === 2) {
-            if (isNumeric(arr[1])) {
-                shortName = arr[0];
-                count = arr[1];
-            } else {
-                shortName = value;
-            }
-        } else {
-            shortName = value;
-        }
-        
+        $scope.editableModel.text = newText;
+        filterEmploymentTypeList($scope.editableModel.text);
+        $scope.editableModel.showEmploymentTypesList = false;
+        var target = $(event.target);
+        var input = target.parent('ul').siblings('input');
+        $timeout(function() {input.focus(); });
+    }
+    
+    $scope.getTimeTableElementText = function(rowNumber, day) {
+        return getDaysInfoElementText(rowNumber, day);
+    }
+    
+    function onChangeCellValue(event) {
+        var value = $(event.target).val();
+        $scope.editableModel.text = value;
+        filterEmploymentTypeList($scope.editableModel.text);
+        $scope.editableModel.showEmploymentTypesList = true;
+        $scope.$apply();
+    }
+    
+    function filterEmploymentTypeList(value) {
+        var obj = parseInputValue(value);
+        var shortName = obj.shortName;  
         var find = false;
         if (shortName === '') {
             for (var i = 0; i < $scope.employmentTypes.length; i++) {
@@ -251,7 +246,6 @@ myApp.controller('timetableController', function($scope, $http, $timeout) {
             $scope.editableModel.notFoundEmploymentType = true;
             $scope.editableModel.notFoundText = shortName;
         }
-        $scope.$apply();
     }
     
     function endEditCell() {
@@ -259,9 +253,112 @@ myApp.controller('timetableController', function($scope, $http, $timeout) {
         m.nowEdited = false;
         $scope.$apply();
         $('.edited').removeClass('edited');
+        
+        var rowNumber = $scope.editableModel.rowNumber;
+        var day = $scope.editableModel.day;
+        var obj = parseInputValue($scope.editableModel.text);
+        var time = obj.time;
+        var employmentTypeShortName = obj.shortName;
+        var employmentTypeId = undefined;
+        if (employmentTypeShortName !== '') {
+            employmentTypeId = getEmploymentTypeId(employmentTypeShortName);
+            if (employmentTypeId === undefined) {
+                alert('введены неправильные данные!');
+                return;
+            }
+        }
+        saveDaysInfoElement(rowNumber, day, time, employmentTypeId, employmentTypeShortName);
     }
     
-    /* */
+    function getEmploymentTypeId(employmentTypeShortName) {
+        var employmentTypeId = undefined;
+        for (var i = 0; i < $scope.employmentTypes.length; i++) {
+            var elem = $scope.employmentTypes[i];
+            if (elem.short_name.toLowerCase() === employmentTypeShortName.toLowerCase()) {
+                employmentTypeId = elem.employment_type_id;
+            }
+        }
+        return employmentTypeId;
+    }
+    
+    /*
+     * 
+     * @param {type} value
+     * @returns {time:  shortName:  }
+     */
+    function parseInputValue(value) {
+        var shortName = '';
+        var time = undefined;
+        var a = value.split(' ');
+        var arr = [];
+        for (var i = 0; i < a.length; i++) {
+            if (a[i] !== '') {
+                arr.push(a[i]);
+            }
+        }
+        if (arr.length === 0) {
+            
+        } else if (arr.length === 1) {
+            var elem = arr[0];
+            if (isNumeric(elem)) {
+                time = Number(elem);
+            } else {
+                shortName = elem;
+            }
+        } else if (arr.length === 2) {
+            if (isNumeric(arr[1])) {
+                shortName = arr[0];
+                time = arr[1];
+            } else {
+                shortName = value;
+            }
+        } else {
+            shortName = value;
+        }
+        return {
+            shortName: shortName,
+            time: time
+        };
+    }
+    
+    function saveDaysInfoElement(rowNumber, day, time, employmentTypeId, employmentTypeShortName) {
+        $scope.daysInfoArray[rowNumber].days[day] = {
+            time: time,
+            employment_type_id: employmentTypeId,
+            employment_type_short_name: employmentTypeShortName
+        };
+        $scope.$apply();
+    }
+    
+    function getDaysInfoElementText(rowNumber, day) {
+        var arr = $scope.daysInfoArray;
+        if (arr[rowNumber] && arr[rowNumber].days && arr[rowNumber].days[day]) {
+            var obj = arr[rowNumber].days[day];
+            var time = obj.time;
+            var text = obj.employment_type_short_name;
+            if (time !== undefined && time !== null) {
+                text += ' ' + time;
+            }
+            return text;
+        } else {
+            return '';
+        }
+    }
+    
+    function getDaysInfoRow() {
+        $scope.daysInfoArray.push({
+            timetable_worker_id: '',
+            days: {}
+        });
+    }
+    
+    function deleteDaysInfoRow(rowNumber) {
+        $scope.daysInfoArray.splice(rowNumber, 1);
+    }
+    
+    /* ------------------------------------------------------- */
+    /* ------------------------------------------------------- */
+    /* ------------------------------------------------------- */
     
     function setDataForAdd() {
         var url = '?r=timetable/add_info';
@@ -299,6 +396,7 @@ myApp.controller('timetableController', function($scope, $http, $timeout) {
             $scope.timetableModel = result.model;
             $scope.timetableWorkerArray = result.timetableWorkerArray;
             $scope.employmentTypes = result.employmentTypes;
+            $scope.daysInfoArray = result.daysInfoArray;
             $scope.days = getDays(getMonth(), getYear());
         });
     }
@@ -326,12 +424,10 @@ myApp.controller('timetableController', function($scope, $http, $timeout) {
     }
     
     function getMonth() {
-        //return Number($('.monthSelect').val());
         return Number($scope.timetableModel.month);
     }
     
     function getYear() {
-        //return Number($('.yearSelect').val());
         return Number($scope.timetableModel.year);
     }
     
