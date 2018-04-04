@@ -8,6 +8,10 @@ body {
     color: red;
 }
 
+.darkRow {
+    background-color: #f3f3f3;
+}
+
 .timetable-table-1 {
     float:left;
     width: auto;

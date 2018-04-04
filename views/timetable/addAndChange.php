@@ -66,13 +66,13 @@ $listUrl = Url::to([$controllerName .  "/list"]);
                 <td class="worker-column" width="300" >Сотрудник</td>
                 <td class="total-column" width="200" >Итого</td>
             </tr>
-            <tbody ng-repeat="timetable_worker in getDaysInfoArray()">
-                <tr ng-repeat="timetable_row in  timetable_worker.rows">
+            <tbody ng-repeat="(timetableWorkerIndex, timetable_worker) in getDaysInfoArray()">
+                <tr ng-repeat="(rowIndex, timetable_row) in  timetable_worker.rows" ng-class="timetableWorkerIndex % 2 !== 0 ? 'darkRow' : ''">
                     <td>{{$index == 0 ? $parent.$index + 1 : ''}}</td>
                     <td>{{$index == 0 ? timetable_worker.fio : ''}}
                         <button ng-show="$index === 0" ng-click="deleteTimetableWorker($parent.$index)" type="button" class="btn btn-default btn-xs timetableDeleteButton" > <span class="glyphicon glyphicon-remove"></span> </button>
                     </td>
-                    <td></td>
+                    <td><div ng-if="rowIndex === 0" title="{{getTotalText(timetableWorkerIndex)}}">{{getPartTotalText(timetableWorkerIndex)}}</div></td>
                 </tr>
             </tbody>
         </table>
@@ -82,7 +82,7 @@ $listUrl = Url::to([$controllerName .  "/list"]);
                 <td ng-repeat="day in days" ng-class="(day.holiday) ? 'holiday' : '' ">{{day.dayOfMonth}}&nbsp;{{day.dayOfWeekName}}</td>
             </tr>
             <tbody ng-repeat="(timetableWorkerIndex, timetable_worker) in getDaysInfoArray()">
-                <tr ng-repeat="(rowIndex, timetable_row) in timetable_worker.rows">
+                <tr ng-repeat="(rowIndex, timetable_row) in timetable_worker.rows" ng-class="timetableWorkerIndex % 2 !== 0 ? 'darkRow' : ''" >
                     <td class="dayCell" ng-repeat="day in days" ng-dblclick="editCell(timetableWorkerIndex, rowIndex, day.dayOfMonth, $event)" >
                         <div class="dayCellDiv" ng-hide="cellEdited(timetableWorkerIndex, rowIndex, day.dayOfMonth)" >
                             {{getDayElementText(timetableWorkerIndex, rowIndex, day.dayOfMonth)}}

@@ -340,8 +340,8 @@ class TimetableController extends Controller
                     $timetableRowId = $timetableRowModel->timetable_row_id;
                     foreach ($row['days'] as $dayNumber => $dayInfo) {
                         if (isset($dayInfo)) {
-                            $time = $dayInfo['time'];
-                            $employmentTypeId = $dayInfo['employment_type_id'];
+                            $time = isset($dayInfo['time']) ? $dayInfo['time'] : null;
+                            $employmentTypeId = isset($dayInfo['employment_type_id']) ? $dayInfo['employment_type_id'] : null;
                             if ($time === null && $employmentTypeId === null) {
                                 continue;
                             }

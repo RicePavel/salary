@@ -74,6 +74,23 @@ myApp.controller('timetableController', function($scope, $http, $timeout) {
         }
     };
     
+    $scope.getPartTotalText = function (timetableWorkerIndex) {
+        var str = $scope.getTotalText(timetableWorkerIndex);
+        if (str.length > 7) {
+            str = str.substring(0, 7) + '...';
+        }
+        return str;
+    };
+    
+    $scope.getTotalText = function(timetableWorkerIndex) {
+        var obj = daysInfoKeeper.getTotals(timetableWorkerIndex);
+        var str = '';
+        for (var shortName in obj) {
+            str += shortName + ' ' + obj[shortName].days + ' д. ' + obj[shortName].hours + ' ч.  ';
+        }
+        return str;
+    };
+    
     $scope.getDaysInfoArray = function() {
         var daysInfoArray = daysInfoKeeper.getDaysInfoArray();
         return daysInfoArray;
@@ -557,6 +574,36 @@ function DaysInfoKeeper(daysInfoArray) {
             }
         }
         return maxCountRows;
+    };
+    
+    /**
+     * 
+     * {shortName: {days: , hours: } }
+     * 
+     * @param {type} timetableWorkerIndex
+     * @returns {shortName: {days: , hours: } }
+     */
+    this.getTotals = function(timetableWorkerIndex) {
+        var obj = {};
+        var rows = timetableWorkersArray[timetableWorkerIndex].rows;
+        for (var k = 0; k < rows.length; k++) {
+            var days = rows[k].days;
+            for (var d in days) {
+                var day = days[d];
+                var shortName = day.short_name;
+                var time = day.time;
+                if (shortName) {
+                    if (!(shortName in obj)) {
+                        obj[shortName] = {days: 0, hours: 0};
+                    }
+                    obj[shortName].days++;
+                    if (time !== undefined) {
+                        obj[shortName].hours += Number(time);
+                    }
+                }
+            }
+        }
+        return obj;
     };
     
     function existCompletedDays(row) {
