@@ -18,17 +18,7 @@ class Timetable extends ActiveRecord {
     }
     
     public function getTimetable_workers() {
-        return $this->hasMany(Timetable_worker::className(), ['timetable_id' => 'timetable_id']);
+        return $this->hasMany(Timetable_worker::className(), ['timetable_id' => 'timetable_id'])->orderBy('number');
     }
-    
-    /*
-    public function setCreate_date($value) {
-        $this->create_date = DateFormat::toSqlFormat($value);
-    }
-    
-    public function getCreateDate() {
-        return DateFormat::toWebFormat($this->create_date);
-    }
-     */
     
 }

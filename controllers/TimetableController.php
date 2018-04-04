@@ -13,6 +13,7 @@ use app\models\Unit;
 use app\models\Timetable;
 use app\models\Timetable_worker;
 use app\models\Day_info;
+use app\models\Timetable_row;
 use app\models\Employment_type;
 use app\helpers\DateFormat;
 use yii\helpers\BaseJson;
@@ -119,13 +120,6 @@ class TimetableController extends Controller
             $transaction = Yii::$app->db->beginTransaction();
             try {
                 $paramsArray = $_REQUEST['Model'];
-                $timetableWorkerArray = [];
-                if (isset($_REQUEST['timetableWorkerArray'])) {
-                    $timetableWorkerArray = BaseJson::decode($_REQUEST['timetableWorkerArray']);
-                    if (!is_array($timetableWorkerArray)) {
-                        $timetableWorkerArray = [];
-                    }
-                }
                 $daysInfoArray = [];
                 if (isset($_REQUEST['daysInfoArray'])) {
                     $daysInfoArray = BaseJson::decode($_REQUEST['daysInfoArray']);
@@ -133,7 +127,7 @@ class TimetableController extends Controller
                         $daysInfoArray = [];
                     }
                 }
-                $ok = $this->add($paramsArray, $timetableWorkerArray, $daysInfoArray);
+                $ok = $this->add($paramsArray, $daysInfoArray);
                 
             } catch (Exception $e) {
                 $transaction->rollBack();
@@ -199,7 +193,6 @@ class TimetableController extends Controller
             $timetableWorkerArray = [];
             $daysInfoArray = [];
             if ($model != null) {
-                $timetableWorkerArray = $this->getTimetableWorkerArray($model->timetable_id);
                 $daysInfoArray = $this->getDaysInfoArray($model->timetable_id);
             }
             $result = ['model' => $model, 
@@ -219,21 +212,15 @@ class TimetableController extends Controller
             $error = '';
             try {
                 $paramsArray = $_REQUEST['Model'];
-                $id = $paramsArray[$this->primaryKeyName];
-                $model = Timetable::findOne($id);
+                $timetableId = $paramsArray[$this->primaryKeyName];
+                $model = Timetable::findOne($timetableId);
                 $ok = $this->change($model, $paramsArray);
                 if ($ok) {
-                    if (isset($_REQUEST['timetableWorkerArray'])) {
-                        $timetableWorkerArray = BaseJson::decode($_REQUEST['timetableWorkerArray']);
-                        $daysInfoArray = [];
-                        if (isset($_REQUEST['daysInfoArray'])) {
-                            $daysInfoArray = BaseJson::decode($_REQUEST['daysInfoArray']);
-                            if (!is_array($daysInfoArray)) {
-                                $daysInfoArray = [];
-                            }
-                        }
-                        if (is_array($timetableWorkerArray)) {
-                            $this->updateTimetableInformation($id, $timetableWorkerArray, $daysInfoArray);
+                    $daysInfoArray = [];
+                    if (isset($_REQUEST['daysInfoArray'])) {
+                        $daysInfoArray = BaseJson::decode($_REQUEST['daysInfoArray']);
+                        if (is_array($daysInfoArray)) {
+                            $this->saveDaysInfoArray($timetableId, $daysInfoArray);
                         }
                     }
                 }
@@ -273,83 +260,31 @@ class TimetableController extends Controller
     }
     
     private function getDaysInfoArray($timetableId) {
+        
+        $timetableModel = Timetable::find()->
+                where('timetable_id = :timetable_id', ['timetable_id' => $timetableId])
+                ->with('timetable_workers.timetable_rows.days_info.employment_type')
+                ->with('timetable_workers.worker')->one();
         $daysInfoArray = [];
-        $timetableModel = Timetable::find()->where(['timetable_id' => $timetableId])->with('timetable_workers.days_info.employment_type')->one();
-        foreach ($timetableModel->timetable_workers as $timetable_worker) {
-            $number = $timetable_worker->number;
-            $arrayRowNumber = $number - 1;
-            $daysInfoArray[$arrayRowNumber] = [
-                'timetable_worker_id' => $timetable_worker->timetable_worker_id,
-                'days' => []
-            ];
-            foreach ($timetable_worker->days_info as $element) {
-                $day = $element->day;
-                $daysInfoArray[$arrayRowNumber]['days'][$day] = [
-                    'time' => $element->time,
-                    'employment_type_id' => $element->employment_type_id,
-                    'employment_type_short_name' => $element->employment_type->short_name
-                ];
+        
+        foreach ($timetableModel->timetable_workers as $timetableWorkerModel) {
+            $timetableWorker = ['worker_id' => $timetableWorkerModel->worker_id, 
+                'fio' => $timetableWorkerModel->worker->fio,
+                'rows' => []];
+            foreach ($timetableWorkerModel->timetable_rows as $rowModel) {
+                $row = ['days' => []];
+                foreach ($rowModel->days_info as $dayInfoModel) {
+                    $day = ['time' => $dayInfoModel->time, 
+                        'employment_type_id' => $dayInfoModel->employment_type_id,
+                        'short_name' => $dayInfoModel->employment_type->short_name];
+                    $row['days'][$dayInfoModel->day] = $day;
+                }
+                $timetableWorker['rows'][] = $row;
             }
+            $daysInfoArray[] = $timetableWorker;
         }
+        
         return $daysInfoArray;
-    }
-    
-    private function updateTimetableInformation($timetableId, $timetableWorkerArray, $daysInfoArray) {
-        $idsArray = [];
-        // удаление записей, которые надо удалить
-        foreach ($timetableWorkerArray as $elem) {
-           if (($elem['timetable_worker_id']) && $elem['timetable_worker_id'] != '') {
-               $idsArray[] = (string) trim($elem['timetable_worker_id']);
-           }  
-        }
-        $modelsFromBase = Timetable_worker::findAll(['timetable_id' => $timetableId]);
-        foreach ($modelsFromBase as $modelFromBase) {
-            $idFromBase = (string) trim($modelFromBase->timetable_worker_id);
-            if (!in_array($idFromBase, $idsArray)) {
-                $i = $modelFromBase->delete();
-                if ($i === false) {
-                    $this->setErrorFromModel($model);
-                    return false;
-                }
-            }
-        }
-        // сохранение новых записей
-        $number = 1;
-        foreach ($timetableWorkerArray as $arrayRowNumber => $elem) {
-            $timetableWorkerId = '';
-            if (($elem['timetable_worker_id']) && $elem['timetable_worker_id'] != '') {
-                $timetableWorkerId = $elem['timetable_worker_id'];
-                $model = Timetable_worker::findOne($timetableWorkerId);
-                if ($model != null) {
-                    $model->worker_id = $elem['worker_id'];
-                    $model->number = $number;
-                    $ok = $model->save();
-                    if (!$ok) {
-                        $this->setErrorFromModel($model);
-                        return false;
-                    }
-                }
-            } else {
-                $model = new Timetable_worker();
-                $model->timetable_id = $timetableId;
-                $model->worker_id = $elem['worker_id'];
-                $model->number = $number;
-                $ok = $model->save();
-                $timetableWorkerId = $model->timetable_worker_id;
-                if (!$ok) {
-                    $this->setErrorFromModel($model);
-                    return false;
-                }
-            }
-            if ($ok) {
-                $ok = $this->saveDaysInfoRow($daysInfoArray, $arrayRowNumber, $timetableWorkerId);
-                if (!$ok) {
-                    return false;
-                }
-            }
-            $number++;
-        }
-        return true;
     }
     
     public function actionDelete() {
@@ -361,32 +296,15 @@ class TimetableController extends Controller
         }
     }
     
-    private function add($paramsArray, $timetableWorkerArray, $daysInfoArray) {
+    private function add($paramsArray, $daysInfoArray) {
         $model = new Timetable();
         $model->setAttributes($paramsArray, false);
         $this->beforeSave($model);
         $ok = $model->save();
         if ($ok) {
             $timetable_id = $model->timetable_id;
-            $number = 1;
-            foreach ($timetableWorkerArray as $key => $element) {
-                $worker_id = $element['worker_id'];
-                $timetableWorkerModel = new Timetable_worker();
-                $timetableWorkerModel->timetable_id = $timetable_id;
-                $timetableWorkerModel->worker_id = $worker_id;
-                $timetableWorkerModel->number = $number;
-                $ok = $timetableWorkerModel->save();
-                if (!$ok) {
-                    $this->setError($model->getErrorSummary(true));
-                    return false;
-                }
-                $timetableWorkerId = $timetableWorkerModel->timetable_worker_id;
-                $ok = $this->saveDaysInfoRow($daysInfoArray, $key, $timetableWorkerId);
-                if (!$ok) {
-                    return false;
-                }
-                $number++;
-            }
+            
+            $this->saveDaysInfoArray($timetable_id, $daysInfoArray);
         }
         if (!$ok) {
             $this->setError($model->getErrorSummary(true));
@@ -394,38 +312,54 @@ class TimetableController extends Controller
         return $ok;
     }
     
-    
-    private function saveDaysInfoRow($daysInfoArray, $rowNumber, $timetableWorkerId) {
-        $this->deleteDaysInfoRow($timetableWorkerId);
-        $row = $daysInfoArray[$rowNumber];
-        if (isset($row)) {
-            $days = $row['days'];
-            if (isset($days)) {
-                foreach ($days as $dayNumber => $elem) {
-                    $time = isset($elem['time']) ? $elem['time'] : null;
-                    if (isset($elem['employment_type_id'])) {
-                        $employment_type_id = $elem['employment_type_id'];
-                        $model = new Day_info();
-                        $model->day = $dayNumber;
-                        $model->time = $time;
-                        $model->timetable_worker_id = $timetableWorkerId;
-                        $model->employment_type_id = $employment_type_id;
-                        $ok = $model->save();
-                        if (!$ok) {
-                            $this->setErrorFromModel($model);
-                            return false;
+    private function saveDaysInfoArray($timetableId, $daysInfoArray) {            
+            $sql = 'delete from timetable_worker where timetable_id = :timetable_id';
+            $command = Yii::$app->db->createCommand($sql, ['timetable_id' => $timetableId]);
+            $command->execute();
+            
+            foreach ($daysInfoArray as $timetableWorkerIndex => $timetableWorker) {
+                $timetableWorkerModel = new Timetable_worker();
+                $timetableWorkerModel->timetable_id = $timetableId;
+                $timetableWorkerModel->worker_id = $timetableWorker['worker_id'];
+                $timetableWorkerModel->number = $timetableWorkerIndex;
+                $ok = $timetableWorkerModel->save();
+                if (!$ok) {
+                    $this->setErrorFromModel($timetableWorkerModel);
+                    return false;
+                }
+                $timetableWorkerId = $timetableWorkerModel->timetable_worker_id;
+                foreach ($timetableWorker['rows'] as $rowIndex => $row) {
+                    $timetableRowModel = new Timetable_row();
+                    $timetableRowModel->timetable_worker_id = $timetableWorkerId;
+                    $timetableRowModel->number = $rowIndex;
+                    $ok = $timetableRowModel->save();
+                    if (!$ok) {
+                        $this->setErrorFromModel($timetableRowModel);
+                        return false;
+                    }
+                    $timetableRowId = $timetableRowModel->timetable_row_id;
+                    foreach ($row['days'] as $dayNumber => $dayInfo) {
+                        if (isset($dayInfo)) {
+                            $time = $dayInfo['time'];
+                            $employmentTypeId = $dayInfo['employment_type_id'];
+                            if ($time === null && $employmentTypeId === null) {
+                                continue;
+                            }
+                            $dayInfoModel = new Day_info();
+                            $dayInfoModel->day = $dayNumber;
+                            $dayInfoModel->time = $time;
+                            $dayInfoModel->employment_type_id = $employmentTypeId;
+                            $dayInfoModel->timetable_row_id = $timetableRowId;
+                            $ok = $dayInfoModel->save();
+                            if (!$ok) {
+                                $this->setErrorFromModel($dayInfoModel);
+                                return false;
+                            }
                         }
                     }
                 }
             }
-        }
-        return true;
-    }
-    
-    private function deleteDaysInfoRow($timetableWorkerId) {
-        $conn = Yii::$app->db;
-        $command = $conn->createCommand('delete from day_info where timetable_worker_id = :timetable_worker_id ', ['timetable_worker_id' => $timetableWorkerId]);
-        $command->execute();
+            return true;  
     }
     
     private function change($model, $paramsArray) {
@@ -436,16 +370,6 @@ class TimetableController extends Controller
             $this->setError($model->getErrorSummary(true));
         }
         return $ok;
-    }
-    
-    private function getTimetableWorkerArray($timetableId) {
-        $query = new \yii\db\Query();
-        $query->select('tw.timetable_worker_id, tw.timetable_id, tw.worker_id, tw.number, w.fio as fio')
-                ->from('timetable_worker as tw')
-                ->innerJoin('worker as w', 'tw.worker_id = w.worker_id')
-                ->where('tw.timetable_id = :timetable_id', ['timetable_id' => $timetableId])
-                ->orderBy('tw.number');
-        return $query->all();
     }
     
     private function beforeSave($model) {

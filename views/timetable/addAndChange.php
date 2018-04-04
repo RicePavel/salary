@@ -52,6 +52,10 @@ $listUrl = Url::to([$controllerName .  "/list"]);
 
 <br/>
 
+<!-- deprecated -->
+
+
+
 <div class="tableContainer">
     <div class="secondTableContainer">
         <table class="table table-bordered timetable-table-1">
@@ -60,31 +64,37 @@ $listUrl = Url::to([$controllerName .  "/list"]);
                 <td class="worker-column" width="300" >Сотрудник</td>
                 <td class="total-column" width="200" >Итого</td>
             </tr>
-            <tr ng-repeat="timetableWorker in  timetableWorkerArray">
-                <td>{{$index + 1}}</td>
-                <td>{{timetableWorker.fio}}
-                    <button ng-click="deleteTimetableWorker($index)" type="button" class="btn btn-default btn-xs timetableDeleteButton" > <span class="glyphicon glyphicon-remove"></span> </button>
-                </td>
-                <td title="тест &#10 тест"></td>
-            </tr>
+            <tbody ng-repeat="timetable_worker in getDaysInfoArray()">
+                <tr ng-repeat="timetable_row in  timetable_worker.rows">
+                    <td>{{$index == 0 ? $parent.$index + 1 : ''}}</td>
+                    <td>{{$index == 0 ? timetable_worker.fio : ''}}
+                        <button ng-show="$index === 0" ng-click="deleteTimetableWorker($parent.$index)" type="button" class="btn btn-default btn-xs timetableDeleteButton" > <span class="glyphicon glyphicon-remove"></span> </button>
+                    </td>
+                    <td></td>
+                </tr>
+            </tbody>
         </table>
+        
         <table class="table table-bordered timetable-table-2">
             <tr>
                 <td ng-repeat="day in days" ng-class="(day.holiday) ? 'holiday' : '' ">{{day.dayOfMonth}}&nbsp;{{day.dayOfWeekName}}</td>
             </tr>
-            <tr ng-repeat="timetableWorker in timetableWorkerArray">
-                <td class="dayCell" ng-repeat="day in days" ng-dblclick="editCell($parent.$index, day.dayOfMonth, $event)">
-                    <div class="dayCellDiv" ng-hide="cellEdited($parent.$index, day.dayOfMonth)" >
-                        {{getTimeTableElementText($parent.$index, day.dayOfMonth)}}
-                    </div>
-                    <input class="dayCellInput" type="text" ng-show="cellEdited($parent.$index, day.dayOfMonth)" ng-model="editableModel.text" />
-                    <ul class="employmentTypesList" ng-show="showEmploymentTypesList($parent.$index, day.dayOfMonth)" >
-                        <li class="notFound" ng-show="editableModel.notFoundEmploymentType" >{{editableModel.notFoundText}} не найдено</li>
-                        <li ng-repeat="type in employmentTypes" ng-show="type.show" ng-click="selectEmploymentType(type.short_name, $event)" >{{type.name}} ({{type.short_name}})</li>
-                    </ul>
-                </td>
-            </tr>
+            <tbody ng-repeat="(timetableWorkerIndex, timetable_worker) in getDaysInfoArray()">
+                <tr ng-repeat="(rowIndex, timetable_row) in timetable_worker.rows">
+                    <td class="dayCell" ng-repeat="day in days" ng-dblclick="editCell(timetableWorkerIndex, rowIndex, day.dayOfMonth, $event)" >
+                        <div class="dayCellDiv" ng-hide="cellEdited(timetableWorkerIndex, rowIndex, day.dayOfMonth)" >
+                            {{getDayElementText(timetableWorkerIndex, rowIndex, day.dayOfMonth)}}
+                        </div>
+                        <input class="dayCellInput" type="text"  ng-model="editableModel.text" ng-show="cellEdited(timetableWorkerIndex, rowIndex, day.dayOfMonth)" />
+                        <ul class="employmentTypesList" ng-show="showEmploymentTypesList(timetableWorkerIndex, rowIndex, day.dayOfMonth)" >
+                            <li class="notFound" ng-show="editableModel.notFoundEmploymentType" >{{editableModel.notFoundText}} не найдено</li>
+                            <li ng-repeat="type in employmentTypes" ng-click="selectEmploymentType(type.short_name, $event)" ng-show="type.show"  >{{type.name}} ({{type.short_name}})</li>
+                        </ul>
+                    </td>
+                </tr>
+            </tbody>
         </table>
+        
     </div>
 </div>
 
