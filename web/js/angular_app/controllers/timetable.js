@@ -2,6 +2,8 @@
 
 myApp.controller('timetableController', function($scope, $http, $timeout) {
         
+    const minCountRows = 2;    
+        
     $scope.workers = [];
     
     /*
@@ -59,10 +61,23 @@ myApp.controller('timetableController', function($scope, $http, $timeout) {
         setDataForChange();
     }
     
+    $scope.changeCountRows = function() {
+        var currentCountRows = daysInfoKeeper.getMaxCountRows();
+        if ($scope.timetableModel.count_rows_on_day < minCountRows) {
+            $scope.timetableModel.count_rows_on_day = minCountRows;
+            alert('Невозможно уменьшить количество строк. Количество должно быть не менее ' + minCountRows);
+        } else if ($scope.timetableModel.count_rows_on_day < currentCountRows) {
+            $scope.timetableModel.count_rows_on_day = currentCountRows;
+            alert('Невозможно уменьшить количество строк. Есть полностью заполненные дни.');
+        } else {
+            daysInfoKeeper.setCountRowsOnDay($scope.timetableModel.count_rows_on_day);
+        }
+    };
+    
     $scope.getDaysInfoArray = function() {
         var daysInfoArray = daysInfoKeeper.getDaysInfoArray();
         return daysInfoArray;
-    }
+    };
     
     $scope.addTimetableWorker = function() {
         var addWorkerId = $scope.workerIdForAdding;
@@ -75,7 +90,7 @@ myApp.controller('timetableController', function($scope, $http, $timeout) {
                     fio = worker.fio;
                 }
             }
-            daysInfoKeeper.addTimetableWorker(addWorkerId, fio);
+            daysInfoKeeper.addTimetableWorker(addWorkerId, fio, $scope.timetableModel.count_rows_on_day);
             $('#myModal').modal('hide');
         } else {
             alert('выберите пользователя!');
@@ -335,6 +350,7 @@ myApp.controller('timetableController', function($scope, $http, $timeout) {
             $scope.timetableModel.year = String(result.currentYear);
             $scope.timetableModel.month = String(result.currentMonth);
             $scope.timetableModel.create_date = result.currentDate;
+            $scope.timetableModel.count_rows_on_day = minCountRows;
             $scope.employmentTypes = result.employmentTypes;
             $scope.days = getDays(getMonth(), getYear());
         }, function error() {});
@@ -356,6 +372,9 @@ myApp.controller('timetableController', function($scope, $http, $timeout) {
             $scope.months = result.months;
             $scope.units = result.units;
             $scope.timetableModel = result.model;
+            if (!$scope.timetableModel.count_rows_on_day || $scope.timetableModel.count_rows_on_day < minCountRows) {
+                $scope.timetableModel.count_rows_on_day = minCountRows;
+            }
             $scope.timetableWorkerArray = result.timetableWorkerArray;
             $scope.employmentTypes = result.employmentTypes;
             daysInfoKeeper = new DaysInfoKeeper(result.daysInfoArray);
@@ -465,13 +484,34 @@ function DaysInfoKeeper(daysInfoArray) {
         return timetableWorkersArray;
     }; 
     
-    this.addTimetableWorker = function(worker_id, fio) {
-        timetableWorkersArray.push({
+    this.addTimetableWorker = function(worker_id, fio, countRows) {
+        var obj = {
             timetable_worker_id: '',
             fio: fio,
             worker_id: worker_id,
-            rows: [getNewRow(), getNewRow()]
-        });
+            rows: []
+        };
+        while (obj.rows.length < countRows) {
+            obj.rows.push(getNewRow());
+        }
+        
+        timetableWorkersArray.push(obj);
+    };
+    
+    this.setCountRowsOnDay = function(count) {
+        for (var i = 0; i < timetableWorkersArray.length; i++) {
+            var rows = timetableWorkersArray[i].rows;
+            if (rows.length > count) {
+                var newRows = rows.slice(0, count);
+                timetableWorkersArray[i].rows = newRows;
+            } else if (rows.length < count) {
+                var newRows = rows;
+                while (newRows.length < count) {
+                    newRows.push(getNewRow());
+                }
+                timetableWorkersArray[i].rows = newRows;
+            }
+        }
     };
     
     this.getDayInfo = function(timetableWorkerIndex, rowIndex, day) {
@@ -485,7 +525,7 @@ function DaysInfoKeeper(daysInfoArray) {
             }
         }
         return undefined;
-    }
+    };
     
     this.saveDayInfo = function(timetableWorkerIndex, rowIndex, day, time, employment_type_id, short_name) {
         if (timetableWorkersArray[timetableWorkerIndex]) {
@@ -495,10 +535,38 @@ function DaysInfoKeeper(daysInfoArray) {
                 r.days[day] = getNewDay(time, employment_type_id, short_name);
             }
         }
-    }
+    };
     
     this.deleteTimetableWorker = function(index) {
         timetableWorkersArray.splice(index, 1);
+    };
+    
+    this.getMaxCountRows = function() {
+        var maxCountRows = 0;
+        for (var i = 0; i < timetableWorkersArray.length; i++) {
+            var currentCountRows = 0;
+            var timetableWorker = timetableWorkersArray[i];
+            for (var k = 0; k < timetableWorker.rows.length; k++) {
+                var row = timetableWorker.rows[k];
+                if (existCompletedDays(row)) {
+                    currentCountRows++;
+                }
+            }
+            if (currentCountRows > maxCountRows) {
+                maxCountRows = currentCountRows;
+            }
+        }
+        return maxCountRows;
+    };
+    
+    function existCompletedDays(row) {
+        for (var d in row.days) {
+            var day = row.days[d];
+            if (day.time || day.employment_type_id) {
+                return true;
+            }
+        }
+        return false;
     }
     
     function getNewDay(time, employment_type_id, short_name) {

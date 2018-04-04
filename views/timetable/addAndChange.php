@@ -39,7 +39,9 @@ $listUrl = Url::to([$controllerName .  "/list"]);
     Подразделение: 
     <select name="Model[unit_id]" required ng-model="timetableModel.unit_id" convert-to-number >
         <option ng-repeat='unit in units' value='{{unit.unit_id}}' >{{unit.name}}</option>
-    </select> <br/> <br/> 
+    </select> <br/>
+    Максимальное количество видов времени на одну дату: <input class="countRowsInput" type="number" ng-change="changeCountRows()" ng-model="timetableModel.count_rows_on_day" />
+    <br/> <br/> 
     
     <input type="submit" class="btn btn-primary" value="Сохранить" /> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
     <a class="btn btn-default" href="<?= $listUrl ?>" >Отмена</a>

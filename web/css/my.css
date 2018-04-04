@@ -90,3 +90,7 @@ body {
 .employmentTypesList li:hover {
     background-color: #F4FF77;
 }
+
+.countRowsInput {
+    width: 50px;
+}
