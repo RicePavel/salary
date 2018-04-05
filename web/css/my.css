@@ -98,3 +98,10 @@ body {
 .countRowsInput {
     width: 50px;
 }
+
+/* */
+
+.dropDownContainer {
+    float: right;
+    margin-right: 25px;
+}

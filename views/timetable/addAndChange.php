@@ -50,7 +50,7 @@ $listUrl = Url::to([$controllerName .  "/list"]);
 
 <br/><br/>
 
-<button type="button" class="btn btn-default" data-toggle="modal" data-target="#myModal" >Добавить пользователя</button>
+<button type="button" class="btn btn-default" data-toggle="modal" data-target="#myModal" ><span class="glyphicon glyphicon-plus"></span> &nbsp; Добавить пользователя</button>
 
 <br/>
 
@@ -68,10 +68,29 @@ $listUrl = Url::to([$controllerName .  "/list"]);
             </tr>
             <tbody ng-repeat="(timetableWorkerIndex, timetable_worker) in getDaysInfoArray()">
                 <tr ng-repeat="(rowIndex, timetable_row) in  timetable_worker.rows" ng-class="timetableWorkerIndex % 2 !== 0 ? 'darkRow' : ''">
+                    <!-- номер -->
                     <td>{{$index == 0 ? $parent.$index + 1 : ''}}</td>
-                    <td>{{$index == 0 ? timetable_worker.fio : ''}}
-                        <button ng-show="$index === 0" ng-click="deleteTimetableWorker($parent.$index)" type="button" class="btn btn-default btn-xs timetableDeleteButton" > <span class="glyphicon glyphicon-remove"></span> </button>
+                    <!-- сотрудник -->
+                    <td class="workerTd" >
+                        <span class="workerFio">{{$index == 0 ? timetable_worker.fio : ''}}</span>
+                        <select style="display: none;" class="workerFioSelect" ng-if="rowIndex === 0" ng-change="changeWorker(timetableWorkerIndex, getDaysInfoArray()[timetableWorkerIndex].worker_id)" ng-model="getDaysInfoArray()[timetableWorkerIndex].worker_id" convert-to-number >
+                            <option ng-repeat="worker in workers" value="{{worker.worker_id}}" >{{worker.fio}}</option>
+                        </select>
+                        
+                        
+                        <div class="dropdown dropDownContainer" ng-if="rowIndex === 0" class="dropdown">
+                            <button id="dLabel" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="btn btn-default btn-xs" >
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="dLabel" >
+                                <li><a ng-click="copyTimetableWorker(timetableWorkerIndex)" ><span class="glyphicon glyphicon-plus"></span>&nbsp;Скопировать</a></li>
+                                <li><a ng-click="deleteTimetableWorker(timetableWorkerIndex)" ><span style="color: red;" class="glyphicon glyphicon-remove"></span>&nbsp;Удалить</a></li>
+                                <li><a ng-click="up(timetableWorkerIndex)" ><span class="glyphicon glyphicon-arrow-up"></span>&nbsp;Переместить вверх</a></li>
+                                <li><a ng-click="down(timetableWorkerIndex)" ><span class="glyphicon glyphicon-arrow-down"></span>&nbsp;Переместить вниз</a></li>
+                            </ul>
+                        </div>
                     </td>
+                    <!-- итого -->
                     <td><div ng-if="rowIndex === 0" title="{{getTotalText(timetableWorkerIndex)}}">{{getPartTotalText(timetableWorkerIndex)}}</div></td>
                 </tr>
             </tbody>

@@ -74,6 +74,10 @@ myApp.controller('timetableController', function($scope, $http, $timeout) {
         }
     };
     
+    $scope.copyTimetableWorker = function(timetableWorkerIndex) {
+        daysInfoKeeper.copyTimetableWorker(timetableWorkerIndex);
+    };
+    
     $scope.getPartTotalText = function (timetableWorkerIndex) {
         var str = $scope.getTotalText(timetableWorkerIndex);
         if (str.length > 7) {
@@ -151,6 +155,44 @@ myApp.controller('timetableController', function($scope, $http, $timeout) {
                 }
             }
         });
+    };
+    
+    /* редактирование пользователя */
+    
+    $scope.changeWorker = function(timetableWorkerIndex, workerId) {
+        var fio = getWorkerFio(workerId);
+        daysInfoKeeper.setWorker(timetableWorkerIndex, workerId, fio);
+    };
+    
+    $('body').on('dblclick', '.workerTd', function(event) {
+        var target = $(event.target);
+        if (target.prop("tagName") !== "BUTTON") {
+            var td = $(event.currentTarget);
+            var div = td.find('.workerFio');
+            var select = td.find('.workerFioSelect');
+            div.hide();
+            select.show();
+            var finishEditing = function(event) {
+                var target = $(event.target);
+                var tagName = target.prop("tagName");
+                if (tagName !== 'SELECT' && tagName !== 'OPTION') {
+                    div.show();
+                    select.hide();
+                    $(document).off('click', finishEditing);
+                }
+            };
+            $(document).click(finishEditing);
+        }
+    });
+    
+    /** перемещение вверх и вниз */
+    
+    $scope.up = function(index) {
+        daysInfoKeeper.up(index);
+    };
+    
+    $scope.down = function(index) {
+        daysInfoKeeper.down(index);
     }
     
     /* ------------------------------------- */
@@ -466,6 +508,17 @@ myApp.controller('timetableController', function($scope, $http, $timeout) {
         return !isNaN(parseFloat(n)) && isFinite(n);
     }
     
+    function getWorkerFio(workerId) {
+        var fio = '';
+        for (var i = 0; i < $scope.workers.length; i++) {
+            var worker = $scope.workers[i];
+            if (worker.worker_id == workerId) {
+                fio = worker.fio;
+            }
+        }
+        return fio;
+    }
+    
 });
 
 
@@ -604,6 +657,34 @@ function DaysInfoKeeper(daysInfoArray) {
             }
         }
         return obj;
+    };
+    
+    this.setWorker = function(timetableWorkerIndex, workerId, fio) {
+        var elem = timetableWorkersArray[timetableWorkerIndex];
+        elem.worker_id = Number(workerId);
+        elem.fio = fio;
+    };
+    
+    this.copyTimetableWorker = function(timetableWorkerIndex) {
+        var elem = timetableWorkersArray[timetableWorkerIndex];
+        var clone = angular.merge({}, elem);
+        timetableWorkersArray.push(clone);
+    };
+    
+    this.up = function(index) {
+        if (index > 0) {
+            var upElement = timetableWorkersArray[index - 1];
+            timetableWorkersArray[index - 1] = timetableWorkersArray[index];
+            timetableWorkersArray[index] = upElement;
+        } 
+    };
+    
+    this.down = function(index) {
+        if (index < timetableWorkersArray.length - 1) {
+            var downElement = timetableWorkersArray[index + 1];
+            timetableWorkersArray[index + 1] = timetableWorkersArray[index];
+            timetableWorkersArray[index] = downElement;
+        }
     };
     
     function existCompletedDays(row) {
