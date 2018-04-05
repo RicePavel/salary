@@ -1,7 +1,11 @@
 
 
 myApp.controller('timetableController', function($scope, $http, $timeout) {
-        
+     
+    $(window).on('beforeunload', function(event) {
+        return '1';
+    });
+    
     const minCountRows = 2;    
         
     $scope.workers = [];
@@ -129,6 +133,8 @@ myApp.controller('timetableController', function($scope, $http, $timeout) {
     };
     
     $scope.save = function() {
+        $(window).off('beforeunload');
+        
         if (mode === 'add') {
             var url = '?r=timetable/add&type=addByAjax';
         } else {

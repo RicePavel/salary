@@ -15,7 +15,12 @@ $listUrl = Url::to([$controllerName .  "/list"]);
 <div ng-controller="timetableController">
 
 
-
+<script>
+    $(window).unload(function() {
+        alert('1');
+        return confirm('Вы точно хотите уйти со страницы? Измененные данные не сохранятся.');
+    });
+</script>
 
 <br/> 
 
