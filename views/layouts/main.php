@@ -22,16 +22,25 @@ AppAsset::register($this);
     <?= Html::csrfMetaTags() ?>
     <title><?= Html::encode($this->title) ?></title>
     
-     <script type="text/javascript" src="http://code.jquery.com/jquery-2.1.3.min.js"></script> 
+     <!-- <script type="text/javascript" src="http://code.jquery.com/jquery-2.1.3.min.js"></script> -->
+     <script type="text/javascript" src="js/jquery-3.3.1.min.js"></script>
+     
      <script src="bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
     
     <link rel="stylesheet" type="text/css" href="bootstrap-3.3.7-dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="css/my.css">
-    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     
-    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <!-- <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css"> -->
+    <!-- <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script> -->
+    
+    <link rel="stylesheet" href="jquery-ui/jquery-ui.min.css">
+    <script src="jquery-ui/jquery-ui.min.js"></script>
     
     <script src="js/my.js"></script>
+    <script src="js/unit.js" ></script>
+    <script src="js/worker.js" ></script>
+    <script src="js/position.js" ></script>
+    <script src="js/employment_type.js" ></script>
     
     <script src="js/angular.min.js"></script>  
     <script src="js/jquery.json.js"></script>

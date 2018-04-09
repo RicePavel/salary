@@ -10,6 +10,7 @@ use yii\filters\VerbFilter;
 use app\models\LoginForm;
 use app\models\ContactForm;
 use app\models\Position;
+use app\helpers\Output;
 
 class PositionController extends Controller
 {
@@ -41,34 +42,58 @@ class PositionController extends Controller
     
     public function actionAdd() {
         $error = "";
+        $type = (isset($_REQUEST['type']) ? $_REQUEST['type'] : '');
+        $ajaxResult = ['ok' => true, 'html' => ''];
         if (isset($_REQUEST['submit'])) {
             $paramsArray = $_REQUEST['Model'];
             $ok = $this->add($paramsArray);
             if (!$ok) {
                 $error = $this->getError();
             }
+            $ajaxResult['ok'] = $ok;
             if ($ok) {
-                $this->redirect([$this->controllerName . "/list"]);
+                if ($type === 'ajax') {
+                   Output::sendInJson($ajaxResult);
+                } else {
+                    $this->redirect([$this->controllerName . "/list"]);
+                }
             }
         }
-        return $this->render("add", ["error" => $error]);
+        if ($type === 'ajax') {
+            $ajaxResult['html'] = $this->renderPartial("add", ["error" => $error]);
+            Output::sendInJson($ajaxResult);
+        } else {
+            return $this->render("add", ["error" => $error]);
+        }
     }
     
     public function actionChange() {
         $error = "";
         $id = $_REQUEST[$this->primaryKeyName];
         $model = Position::findOne($id);
+        $type = (isset($_REQUEST['type']) ? $_REQUEST['type'] : '');
+        $ajaxResult = ['ok' => true, 'html' => ''];
         if (isset($_REQUEST['submit'])) {
             $paramsArray = $_REQUEST["Model"];
             $ok = $this->change($model, $paramsArray);
             if (!$ok) {
                 $error = $this->getError();
             }
+            $ajaxResult['ok'] = $ok;
             if ($ok) {
-                $this->redirect([$this->controllerName . "/list"]);
+                if ($type === 'ajax') {
+                   Output::sendInJson($ajaxResult);
+                } else {
+                    $this->redirect([$this->controllerName . "/list"]);
+                }
             }
         } 
-        return $this->render("change", ["error" => $error, "model" => $model]);
+        if ($type === 'ajax') {
+           $ajaxResult['html'] =  $this->renderPartial("change", ["error" => $error, "model" => $model]);
+           Output::sendInJson($ajaxResult);
+        } else {
+           return $this->render("change", ["error" => $error, "model" => $model]); 
+        }
     }
     
     public function actionDelete() {

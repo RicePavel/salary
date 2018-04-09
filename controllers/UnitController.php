@@ -10,6 +10,7 @@ use yii\filters\VerbFilter;
 use app\models\LoginForm;
 use app\models\ContactForm;
 use app\models\Unit;
+use app\helpers\Output;
 
 class UnitController extends Controller
 {
@@ -60,32 +61,56 @@ class UnitController extends Controller
     
     public function actionAdd() {
         $error = "";
+        $type = "";
+        $ajaxResult = ['ok' => true, 'html' => ''];
+        if (isset($_REQUEST['type'])) {
+            $type = $_REQUEST['type'];
+        }
         if (isset($_REQUEST['submit'])) {
             $paramsArray = $_REQUEST['Model'];
             $ok = $this->add($paramsArray);
             if (!$ok) {
                 $error = $this->getError();
             }
-            if ($ok) {
+            if ($ok && $type !== 'ajax') {
                 $this->redirect([$this->controllerName . "/list"]);
+            }
+            if ($type === 'ajax') {
+                $ajaxResult['ok'] = $ok;
+                if ($ok) {
+                    Output::sendInJson($ajaxResult);
+                }
             }
         }
         $units = Unit::find()->all();
-        return $this->render("add", ["error" => $error, "units" => $units]);
+        if ($type === 'ajax') {
+            //return $this->renderPartial("add", ["error" => $error, "units" => $units]);
+            $ajaxResult['html'] = $this->renderPartial("add", ["error" => $error, "units" => $units]);
+            Output::sendInJson($ajaxResult);
+        } else {
+            return $this->render("add", ["error" => $error, "units" => $units]);
+        }
     }
     
     public function actionChange() {
         $error = "";
         $id = $_REQUEST[$this->primaryKeyName];
         $model = Unit::findOne($id);
+        $ajaxResult = ['ok' => true, 'html' => ''];
+        $type = (isset($_REQUEST['type']) ? $_REQUEST['type'] : '');
         if (isset($_REQUEST['submit'])) {
             $paramsArray = $_REQUEST["Model"];
             $ok = $this->change($model, $paramsArray);
             if (!$ok) {
                 $error = $this->getError();
             }
+            $ajaxResult['ok'] = $ok;
             if ($ok) {
-                $this->redirect([$this->controllerName . "/list"]);
+                if ($type === 'ajax') {
+                    Output::sendInJson($ajaxResult);
+                } else {
+                    $this->redirect([$this->controllerName . "/list"]);
+                }
             }
         } 
         $allUnits = Unit::find()->all();
@@ -95,7 +120,12 @@ class UnitController extends Controller
                 $units[] = $unit;
             }
         }
-        return $this->render("change", ["error" => $error, "model" => $model, "units" => $units]);
+        if ($type === 'ajax') {
+            $ajaxResult['html'] = $this->renderPartial("change", ["error" => $error, "model" => $model, "units" => $units]);
+            Output::sendInJson($ajaxResult);
+        } else {
+            return $this->render("change", ["error" => $error, "model" => $model, "units" => $units]);
+        }
     }
     
     public function actionDelete() {
