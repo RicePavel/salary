@@ -1,6 +1,7 @@
 <?php
      
 use yii\helpers\Url;
+use app\models\Work_type;
 
 $controllerName = "worker";
 $primaryKeyName = "worker_id";
@@ -17,6 +18,9 @@ $addUrl = Url::to([$controllerName . "/add"]);
         <th>ФИО</th>
         <th>Табельный номер</th>
         <th>Должность</th>
+        <th>Подразделение</th>
+        <th>Код из 1С</th>
+        <th>Вид занятости</th>
         <th></th>
         <th></th>
     </tr>
@@ -28,6 +32,9 @@ $addUrl = Url::to([$controllerName . "/add"]);
         <td><?= $elem->fio ?></td>
         <td><?= $elem->person_number ?></td>
         <td> <?= $elem->position->name ?> </td>
+        <td> <?= $elem->unit->name ?> </td>
+        <td> <?= $elem->code_1c ?> </td>
+        <td> <?= Work_type::getName($elem->work_type_id) ?> </td>
         <td> <a href="<?= $changeUrl ?>">Изменить</a> </td>
         <td> <a onclick="return confirm('Подтвердите удаление')" href="<?= $deleteUrl ?>">Удалить</a> </td>
     </tr>

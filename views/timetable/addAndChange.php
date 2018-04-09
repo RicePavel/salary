@@ -24,6 +24,15 @@ $listUrl = Url::to([$controllerName .  "/list"]);
 
 <br/> 
 
+<style type="text/css">
+    .container {
+        width: 100% !important;
+    }
+    .tableContainer {
+        width: 100% !important;
+    }
+</style>
+
 <form ng-submit="save()">
     <!-- <button type="button" class="btn btn-primary" >Сохранить</button> -->
     

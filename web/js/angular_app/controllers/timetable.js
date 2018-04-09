@@ -8,6 +8,9 @@ myApp.controller('timetableController', function($scope, $http, $timeout) {
     
     const minCountRows = 2;    
         
+    const DEFAULT_EMPLOYMENT_TYPE_ID = 2;
+    const DEFAULT_EMPLOYMENT_TYPE_SHORT_NAME = 'Я';
+        
     $scope.workers = [];
     
     /*
@@ -246,9 +249,21 @@ myApp.controller('timetableController', function($scope, $http, $timeout) {
                 endEditCell();
                 $(document).off('click', onEndEdit);
             }
-        }
+        };
         $(document).click(onEndEdit);
-    }
+        
+        var endEditByKeypress = function(event) {
+            if (event.keyCode == 13) {
+                endEditCell();
+                $(document).off('keypress', endEditByKeypress);
+                var nextTd = td.next("td");
+                if (nextTd.length === 1) {
+                    nextTd.dblclick();
+                }
+            }
+        };
+        $(document).keypress(endEditByKeypress);
+    };
     
     function getDayInfoText(dayInfoObject) {
         var text = '';
@@ -261,7 +276,7 @@ myApp.controller('timetableController', function($scope, $http, $timeout) {
             }
         }
         return text;
-    }
+    };
     
     // обработчик ввода в поле
     $('body').on('input', '.dayCellInput', function(event) {
@@ -342,6 +357,10 @@ myApp.controller('timetableController', function($scope, $http, $timeout) {
                 alert('введены неправильные данные!');
                 return;
             }
+        }
+        if (employmentTypeId === undefined && time !== undefined) {
+            employmentTypeId = DEFAULT_EMPLOYMENT_TYPE_ID;
+            employmentTypeShortName = DEFAULT_EMPLOYMENT_TYPE_SHORT_NAME;
         }
         daysInfoKeeper.saveDayInfo(timetableWorkerIndex, rowIndex, day, time, employmentTypeId, employmentTypeShortName);
         $scope.$apply();

@@ -11,6 +11,8 @@ use app\models\LoginForm;
 use app\models\ContactForm;
 use app\models\Worker;
 use app\models\Position;
+use app\models\Unit;
+use app\models\Work_type;
 use yii\helpers\BaseJson;
 
 class WorkerController extends Controller
@@ -33,11 +35,15 @@ class WorkerController extends Controller
     }
     
     private function getList() {
-       return Worker::find()->with("position")->all(); 
+       return Worker::find()->with("position")->with("unit")->all(); 
     }
     
     private function getPositions() {
        return Position::find()->all(); 
+    }
+    
+    private function getUnits() {
+        return Unit::find()->all();
     }
     
     private function sendInJson($data) {
@@ -49,6 +55,7 @@ class WorkerController extends Controller
     }
     
     public function actionList() {
+        
         $type = '';
         if (isset($_REQUEST['type'])) {
             $type = $_REQUEST['type'];
@@ -74,7 +81,7 @@ class WorkerController extends Controller
                 $this->redirect([$this->controllerName . "/list"]);
             }
         }
-        return $this->render("add", ["error" => $error, "positions" => $this->getPositions()]);
+        return $this->render("add", ["error" => $error, "positions" => $this->getPositions(), "units" => $this->getUnits()]);
     }
     
     public function actionChange() {
@@ -92,7 +99,7 @@ class WorkerController extends Controller
             }
         }
         $positions = $this->getPositions();
-        return $this->render("change", ["error" => $error, "model" => $model, "positions" => $positions]);
+        return $this->render("change", ["error" => $error, "model" => $model, "positions" => $positions, "units" => $this->getUnits()]);
     }
     
     public function actionDelete() {
