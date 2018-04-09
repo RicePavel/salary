@@ -13,5 +13,12 @@ $addUrl = Url::to([$controllerName . "/add"]);
 
 <form action="<?= $addUrl ?>" method="POST" >
     Наименование: <input type="text" name="Model[name]" value="<?= isset($_REQUEST["Model[name]"]) ? $_REQUEST["Model[name]"] : '' ?>" required /> <br/> <br/>
+    Вышестоящее подразделение: 
+    <select name="Model[parent_id]">
+        <option value="" >--</option>
+        <?php foreach ($units as $unit) { ?>
+            <option value="<?= $unit->unit_id ?>"><?= $unit->name ?></option>
+        <?php } ?>
+    </select> <br/><br/>
     <input type="submit" name="submit" value="Добавить" />
 </form>

@@ -31,7 +31,26 @@ class UnitController extends Controller
     }
     
     private function getList() {
-       return Unit::find()->all(); 
+       $units = Unit::find()->all();
+       $unitsArray = [];
+       foreach ($units as $unit) {
+           $unitsArray[$unit->unit_id] = $unit;
+       }
+       foreach ($unitsArray as $unitId => $unit) {
+           $parentId = $unit->parent_id;
+           if ($parentId !== null) {
+               if (isset($unitsArray[$parentId])) {
+                   $unitsArray[$parentId]->addChild($unit);
+               }
+           }
+       }
+       $units = [];
+       foreach ($unitsArray as $unitId => $unit) {
+           if ($unit->parent_id === null) {
+               $units[] = $unit;
+           }
+       }
+       return $units; 
     }
     
     public function actionList() {
@@ -51,7 +70,8 @@ class UnitController extends Controller
                 $this->redirect([$this->controllerName . "/list"]);
             }
         }
-        return $this->render("add", ["error" => $error]);
+        $units = Unit::find()->all();
+        return $this->render("add", ["error" => $error, "units" => $units]);
     }
     
     public function actionChange() {
@@ -68,7 +88,14 @@ class UnitController extends Controller
                 $this->redirect([$this->controllerName . "/list"]);
             }
         } 
-        return $this->render("change", ["error" => $error, "model" => $model]);
+        $allUnits = Unit::find()->all();
+        $units = [];
+        foreach ($allUnits as $unit) {
+            if ($unit->unit_id !== $model->unit_id) {
+                $units[] = $unit;
+            }
+        }
+        return $this->render("change", ["error" => $error, "model" => $model, "units" => $units]);
     }
     
     public function actionDelete() {

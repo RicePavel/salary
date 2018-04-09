@@ -55,8 +55,8 @@ AppAsset::register($this);
 <div class="wrap">
     <?php
     NavBar::begin([
-        'brandLabel' => Yii::$app->name,
-        'brandUrl' => Yii::$app->homeUrl,
+        //'brandLabel' => Yii::$app->name,
+        //'brandUrl' => Yii::$app->homeUrl,
         'options' => [
             'class' => 'navbar-inverse navbar-fixed-top',
         ],
@@ -68,7 +68,7 @@ AppAsset::register($this);
             ['label' => 'Сотрудники', 'url' => ['worker/list']],
             ['label' => 'Должности', 'url' => ['position/list']],
             ['label' => 'Подразделения', 'url' => ['unit/list']],
-            ['label' => 'Виды занятости', 'url' => ['employment-type/list']]
+            ['label' => 'Виды рабочего времени', 'url' => ['employment-type/list']]
         ],
         /*
         'items' => [

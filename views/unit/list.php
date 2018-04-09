@@ -18,15 +18,31 @@ $addUrl = Url::to([$controllerName . "/add"]);
         <th></th>
         <th></th>
     </tr>
-    <?php foreach ($list as $elem) {
-        $changeUrl = Url::to([$controllerName . "/change", $primaryKeyName => $elem->$primaryKeyName]);
-        $deleteUrl = Url::to([$controllerName . "/delete", $primaryKeyName => $elem->$primaryKeyName]);
-        ?>
-    <tr>
-        <td><?= $elem->name ?></td>
-        <td> <a href="<?= $changeUrl ?>">Изменить</a> </td>
-        <td> <a onclick="return confirm('Подтвердите удаление')" href="<?= $deleteUrl ?>">Удалить</a> </td>
-    </tr>
-    <?php } ?>
+    <?= renderUnits($list, 0, $controllerName, $primaryKeyName) ?>
 </table>
+
+<?php function renderUnits($units, $level, $controllerName, $primaryKeyName) { ?>
+    <?php foreach ($units as $unit) {
+        $changeUrl = Url::to([$controllerName . "/change", $primaryKeyName => $unit->$primaryKeyName]);
+        $deleteUrl = Url::to([$controllerName . "/delete", $primaryKeyName => $unit->$primaryKeyName]);
+    ?>
+        <tr>
+            <td>
+                <?php 
+                    for ($i = 0; $i < $level; $i++) {
+                        echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
+                    }
+                ?>
+                <?= $unit->name ?>
+            </td>
+            <td> <a href="<?= $changeUrl ?>">Изменить</a> </td>
+            <td> <a onclick="return confirm('Подтвердите удаление')" href="<?= $deleteUrl ?>">Удалить</a> </td>
+        </tr>
+        <?= renderUnits($unit->getChildren(), ($level + 1), $controllerName, $primaryKeyName) ?> 
+    <?php } ?>
+<?php } ?>
+
+<?php function renderTest() { ?>
+    <div>1111</div>
+<?php } ?>
 
