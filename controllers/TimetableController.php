@@ -21,8 +21,6 @@ use yii\helpers\BaseJson;
 class TimetableController extends Controller
 {
     
-    public $enableCsrfValidation = false;
-    
     private $error = "";
     
     private $controllerName = "timetable";

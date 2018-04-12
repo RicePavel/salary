@@ -37,6 +37,7 @@ $changeUrl = Url::to([$controllerName . "/change"]);
             </select>
         </div>
     </div>
+    <input type="hidden" name="<?= Yii::$app->getRequest()->csrfParam ?>" value="<?= Yii::$app->getRequest()->getCsrfToken() ?>" />
     <input type="hidden" name="<?= $primaryKeyName ?>" value="<?= $model->$primaryKeyName ?>" />
     <div class="form-group">
         <div class="col-sm-offset-2 col-sm-5">

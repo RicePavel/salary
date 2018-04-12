@@ -19,6 +19,7 @@ $changeUrl = Url::to([$controllerName . "/change"]);
         </div>
     </div>
     <input type="hidden" name="<?= $primaryKeyName ?>" value="<?= $model->$primaryKeyName ?>" />
+    <input type="hidden" name="<?= Yii::$app->getRequest()->csrfParam ?>" value="<?= Yii::$app->getRequest()->getCsrfToken() ?>" />
     <div class="form-group">
         <div class="col-sm-offset-3 col-sm-5">
             <input class="btn btn-primary" type="submit" name="submit" value="Изменить" />

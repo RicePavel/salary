@@ -19,8 +19,6 @@ use app\helpers\Output;
 class WorkerController extends Controller
 {
     
-    public $enableCsrfValidation = false;
-    
     private $error = "";
     
     private $controllerName = "worker";

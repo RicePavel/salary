@@ -29,6 +29,7 @@ $addUrl = Url::to([$controllerName . "/add"]);
             </select>
         </div>
     </div>
+    <input type="hidden" name="<?= Yii::$app->getRequest()->csrfParam ?>" value="<?= Yii::$app->getRequest()->getCsrfToken() ?>" />
     <div class="form-group">
         <div class="col-sm-offset-3 col-sm-5">
             <input type="submit" class="btn btn-primary" name="submit" value="Добавить" />

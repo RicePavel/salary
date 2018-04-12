@@ -14,11 +14,20 @@ $(document).ready(function() {
     });
     
     $('body').on('submit', '.unitContainer .addForm', function() {
+        
+        /*
         var form = $(this);
         var s = form.serialize();
         var url = '?r=unit/add&type=ajax&submit=1&' + s;
+        */
+        var form = $(this);
+        var url = '?r=unit/add&type=ajax&submit=1';
+        var data = getFormData(form);
+        
         $.ajax({
             url: url,
+            method: 'POST',
+            data: data,
             success: function(response) {
                 var result = $.parseJSON(response);
                 if (result.ok) {
@@ -51,9 +60,12 @@ $(document).ready(function() {
     $('body').on('submit', '.unitContainer .changeForm', function() {
         var form = $(this);
         var s = form.serialize();
-        var url = '?r=unit/change&type=ajax&submit=1&' + s;
+        var url = '?r=unit/change&type=ajax&submit=1&';
+        var data = getFormData(form);
         $.ajax({
             url: url,
+            data: data,
+            method: 'POST',
             success: function(response) {
                 var result = $.parseJSON(response);
                 if (result.ok) {

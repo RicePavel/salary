@@ -135,7 +135,7 @@ myApp.controller('timetableController', function($scope, $http, $timeout) {
         $scope.days = getDays(getMonth(), getYear());
     };
     
-    $scope.save = function() {
+    $scope.save = function(event) {
         $(window).off('beforeunload');
         
         if (mode === 'add') {
@@ -148,6 +148,11 @@ myApp.controller('timetableController', function($scope, $http, $timeout) {
             formData.append('Model[' + key + ']', $scope.timetableModel[key]);
         }
         formData.append('daysInfoArray', $.toJSON(daysInfoKeeper.getDaysInfoArray()));
+        
+        var form = $(event.target);
+        var csrfInput = form.find('.csrfInput');
+        formData.append(csrfInput.attr('name'), csrfInput.val());
+        
         $.ajax({
             url: url,
             data: formData,

@@ -27,8 +27,13 @@ $addUrl = Url::to([$controllerName . "/add"]);
         <tr>
             <td><?= $elem->short_name ?></td>
             <td><?= $elem->name ?></td>
-            <td> <a href="<?= $changeUrl ?>" class="changeLink" data-id="<?= $elem->employment_type_id ?>">Изменить</a> </td>
-            <td> <a onclick="return confirm('Подтвердите удаление')" href="<?= $deleteUrl ?>">Удалить</a> </td>
+            <td> <a href="<?= $changeUrl ?>" class="changeLink" data-id="<?= $elem->employment_type_id ?>"><button class="btn btn-link">Изменить</button></a> </td>
+            <td> 
+                <form onsubmit="return confirm('Подтвердите удаление')" action="<?= $deleteUrl ?>" method="POST" >
+                    <input type="hidden" name="<?= Yii::$app->getRequest()->csrfParam ?>" value="<?= Yii::$app->getRequest()->getCsrfToken() ?>" />
+                    <input type="submit" value="удалить" class="btn btn-link" />
+                </form> 
+            </td>
         </tr>
         <?php } ?>
     </table>

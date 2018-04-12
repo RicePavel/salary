@@ -15,13 +15,6 @@ $listUrl = Url::to([$controllerName .  "/list"]);
 <div ng-controller="timetableController">
 
 
-<script>
-    $(window).unload(function() {
-        alert('1');
-        return confirm('Вы точно хотите уйти со страницы? Измененные данные не сохранятся.');
-    });
-</script>
-
 <br/> 
 
 <style type="text/css">
@@ -33,7 +26,7 @@ $listUrl = Url::to([$controllerName .  "/list"]);
     }
 </style>
 
-<form ng-submit="save()">
+<form ng-submit="save($event)" >
     <!-- <button type="button" class="btn btn-primary" >Сохранить</button> -->
     
     <br/>
@@ -58,6 +51,7 @@ $listUrl = Url::to([$controllerName .  "/list"]);
     <br/> <br/> 
     
     <input type="submit" class="btn btn-primary" value="Сохранить" /> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <input type="hidden" class="csrfInput" name="<?= Yii::$app->getRequest()->csrfParam ?>" value="<?= Yii::$app->getRequest()->getCsrfToken() ?>" />
     <a class="btn btn-default" href="<?= $listUrl ?>" >Отмена</a>
     <!-- <input type="submit" name="submit" value="Добавить" /> -->
 </form>

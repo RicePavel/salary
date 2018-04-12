@@ -21,9 +21,12 @@ $(document).ready(function() {
     $('body').on('submit', '.' + containerClass + ' .addForm', function() {
         var form = $(this);
         var s = form.serialize();
-        var url = '?r=' + controllerName + '/add&type=ajax&submit=1&' + s;
+        var url = '?r=' + controllerName + '/add&type=ajax&submit=1&';
+        var data = getFormData(form);
         $.ajax({
             url: url,
+            data: data,
+            method: 'POST',
             success: function(response) {
                 var result = $.parseJSON(response);
                 if (result.ok) {
@@ -56,9 +59,12 @@ $(document).ready(function() {
     $('body').on('submit', '.' + containerClass + ' .changeForm', function() {
         var form = $(this);
         var s = form.serialize();
-        var url = '?r=' + controllerName + '/change&type=ajax&submit=1&' + s;
+        var url = '?r=' + controllerName + '/change&type=ajax&submit=1&';
+        var data = getFormData(form);
         $.ajax({
             url: url,
+            data: data,
+            method: 'POST',
             success: function(response) {
                 var result = $.parseJSON(response);
                 if (result.ok) {

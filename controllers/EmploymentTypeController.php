@@ -15,8 +15,6 @@ use app\helpers\Output;
 class EmploymentTypeController extends Controller
 {
     
-    public $enableCsrfValidation = false;
-    
     private $error = "";
     
     private $controllerName = "employment-type";
