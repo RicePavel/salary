@@ -88,7 +88,7 @@ myApp.controller('timetableController', function($scope, $http, $timeout) {
     $scope.getPartTotalText = function (timetableWorkerIndex) {
         var str = $scope.getTotalText(timetableWorkerIndex);
         if (str.length > 7) {
-            str = str.substring(0, 7) + '...';
+            str = str.substring(0, 3) + '...';
         }
         return str;
     };

@@ -29,11 +29,13 @@ body {
 }
 
 .timetable-table-1 .total-column {
-    width: 100px;
+    /* width: 100px; */
+   width: 45px;
 }
 
 .timetable-table-2 {
-    margin-left: 505px;
+    /* margin-left: 505px; */
+    margin-left: 450px;
 }
 
 .timetable-table-1 td, .timetable-table-2 td {
@@ -44,10 +46,12 @@ body {
 .timetable-table-2 {
     width: auto !important;
     table-layout: fixed !important;
+    font-size: 9pt;
 }
 
 .timetable-table-2 td {
-    width: 90px;
+    width: 45px;
+    /* width: 90px; */
     position: relative;
 }
 
@@ -59,8 +63,10 @@ body {
 }
 
 .secondTableContainer {
-    width: 3500px;
+    /* width: 3500px; */
+    width: 2000px;
 }
+
 
 .timetableDeleteButton {
     float: right;
@@ -69,8 +75,8 @@ body {
 /* */
 
 .dayCellInput {
-    width: 80px;
-    /* display: none; */
+    /* width: 80px; */
+    width: 40px;
 }
 
 .employmentTypesList {

@@ -32,8 +32,8 @@ $addUrl = Url::to([$controllerName . "/add"]);
         <tr>
             <td><?= $elem->fio ?></td>
             <td><?= $elem->person_number ?></td>
-            <td> <?= $elem->position->name ?> </td>
-            <td> <?= $elem->unit->name ?> </td>
+            <td> <?= ($elem->position !== null ? $elem->position->name : '') ?> </td>
+            <td> <?= ($elem->unit !== null ? $elem->unit->name : '') ?> </td>
             <td> <?= $elem->code_1c ?> </td>
             <td> <?= Work_type::getName($elem->work_type_id) ?> </td>
             <td> 
