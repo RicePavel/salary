@@ -15,6 +15,7 @@ use app\models\Unit;
 use app\models\Work_type;
 use yii\helpers\BaseJson;
 use app\helpers\Output;
+use yii\db\ActiveRecord;
 
 class WorkerController extends Controller
 {
@@ -100,6 +101,7 @@ class WorkerController extends Controller
     
     public function actionChange() {
         $error = "";
+        
         $id = $_REQUEST[$this->primaryKeyName];
         $model = Worker::findOne($id);
         $type = (isset($_REQUEST['type']) ? $_REQUEST['type'] : '');
@@ -137,7 +139,7 @@ class WorkerController extends Controller
         }
     }
     
-    private function add($paramsArray) {
+    private function add(array $paramsArray) {
         $model = new Worker();
         $model->setAttributes($paramsArray, false);
         $ok = $model->save();
@@ -147,7 +149,7 @@ class WorkerController extends Controller
         return $ok;
     }
     
-    private function change($model, $paramsArray) {
+    private function change(ActiveRecord $model, array $paramsArray) {
         $model->setAttributes($paramsArray, false);
         $ok = $model->save();
         if (!$ok) {
