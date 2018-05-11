@@ -25,6 +25,9 @@ $config = [
             ],
         ],
         'db' => $db,
+        'Init' => [
+            'class' => 'app\components\Init'
+        ],
     ],
     'params' => $params,
     /*

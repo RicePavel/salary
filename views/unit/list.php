@@ -11,10 +11,10 @@ $addUrl = Url::to([$controllerName . "/add"]);
 
 <div class="unitContainer">
     <h2>Подразделения</h2> <br/> <br/>
-    <a href="<?= $addUrl ?>" class="addLink" >Добавить </a> <br/><br/>
+    <a href="<?= $addUrl ?>" class="addLink btn btn-default my-btn" >Добавить </a> <br/><br/>
 
     <table class="table">
-        <tr>
+        <tr class="active">
             <th>Наименование</th>
             <th></th>
             <th></th>
@@ -36,11 +36,11 @@ $addUrl = Url::to([$controllerName . "/add"]);
                     ?>
                     <?= $unit->name ?>
                 </td>
-                <td> <a href="<?= $changeUrl ?>" class="changeLink" data-id="<?= $unit->unit_id ?>" ><button class="btn btn-link">Изменить</button></a> </td>
+                <td> <a href="<?= $changeUrl ?>" class="changeLink btn btn-default my-btn" data-id="<?= $unit->unit_id ?>" >Изменить</a> </td>
                 <td> 
                     <form onsubmit="return confirm('Подтвердите удаление')" action="<?= $deleteUrl ?>" method="POST" >
                         <input type="hidden" name="<?= Yii::$app->getRequest()->csrfParam ?>" value="<?= Yii::$app->getRequest()->getCsrfToken() ?>" />
-                        <input type="submit" value="удалить" class="btn btn-link" />
+                        <input type="submit" value="удалить" class="btn btn-default my-btn" />
                     </form>
                 </td>
             </tr>

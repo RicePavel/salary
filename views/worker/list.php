@@ -12,10 +12,10 @@ $addUrl = Url::to([$controllerName . "/add"]);
 
 <div class="workerContainer">
     <h2>Сотрудники</h2> <br/> <br/>
-    <a href="<?= $addUrl ?>" class="addLink" >Добавить </a> <br/><br/>
+    <a class="btn btn-default my-btn" href="<?= $addUrl ?>" class="addLink" >Добавить </a> <br/><br/>
 
     <table class="table">
-        <tr>
+        <tr class="active">
             <th>ФИО</th>
             <th>Табельный номер</th>
             <th>Должность</th>
@@ -37,13 +37,13 @@ $addUrl = Url::to([$controllerName . "/add"]);
             <td> <?= $elem->code_1c ?> </td>
             <td> <?= Work_type::getName($elem->work_type_id) ?> </td>
             <td> 
-                <a href="<?= $changeUrl ?>" class="changeLink" data-id="<?= $elem->worker_id ?>" ><button class="btn btn-link">Изменить</button></a> 
+                <a href="<?= $changeUrl ?>" class="btn btn-default my-btn changeLink" data-id="<?= $elem->worker_id ?>" >Изменить</a> 
             </td>
             <!-- <td> <a onclick="return confirm('Подтвердите удаление')" href="<?= $deleteUrl ?>">Удалить</a> </td> -->
             <td>
                 <form onsubmit="return confirm('Подтвердите удаление')" action="<?= $deleteUrl ?>" method="POST" >
                     <input type="hidden" name="<?= Yii::$app->getRequest()->csrfParam ?>" value="<?= Yii::$app->getRequest()->getCsrfToken() ?>" />
-                    <input type="submit" value="удалить" class="btn btn-link" />
+                    <input type="submit" value="удалить" class="btn btn-default my-btn" />
                 </form>
             </td>
         </tr>

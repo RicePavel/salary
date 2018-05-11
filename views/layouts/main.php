@@ -70,15 +70,58 @@ AppAsset::register($this);
             'class' => 'navbar-inverse navbar-fixed-top',
         ],
     ]);
-    echo Nav::widget([
-        'options' => ['class' => 'navbar-nav navbar-right'],
-        'items' => [
+    
+    if (Yii::$app->user->isGuest) {
+        $items = [];
+    } else {
+        $items = [
             ['label' => 'Табели', 'url' => ['timetable/list']],
             ['label' => 'Сотрудники', 'url' => ['worker/list']],
             ['label' => 'Должности', 'url' => ['position/list']],
             ['label' => 'Подразделения', 'url' => ['unit/list']],
             ['label' => 'Виды рабочего времени', 'url' => ['employment-type/list']]
+        ];
+    }
+    if (Yii::$app->user->isGuest) {
+            $items[] = ['label' => 'Войти', 'url' => ['/site/login']];
+    } else {
+            $items[] =  '<li>'
+                . Html::beginForm(['/site/logout'], 'post')
+                . Html::submitButton(
+                    'Выйти (' . Yii::$app->user->identity->username . ')',
+                    ['class' => 'btn btn-link logout']
+                )
+                . Html::endForm()
+                . '</li>';
+    }
+    
+    echo Nav::widget([
+        'options' => ['class' => 'navbar-nav navbar-right'],
+        'items' => $items
+        /*
+        'items' => [
+            
+            ['label' => 'Табели', 'url' => ['timetable/list']],
+            ['label' => 'Сотрудники', 'url' => ['worker/list']],
+            ['label' => 'Должности', 'url' => ['position/list']],
+            ['label' => 'Подразделения', 'url' => ['unit/list']],
+            ['label' => 'Виды рабочего времени', 'url' => ['employment-type/list']],
+            
+            Yii::$app->user->isGuest ? (
+                ['label' => 'Войти', 'url' => ['/site/login']]
+            ) : (
+                '<li>'
+                . Html::beginForm(['/site/logout'], 'post')
+                . Html::submitButton(
+                    'Выйти (' . Yii::$app->user->identity->username . ')',
+                    ['class' => 'btn btn-link logout']
+                )
+                . Html::endForm()
+                . '</li>'
+            )
         ],
+         */
+        
         /*
         'items' => [
             ['label' => 'Home', 'url' => ['/site/index']],

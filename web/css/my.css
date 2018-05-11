@@ -29,13 +29,13 @@ body {
 }
 
 .timetable-table-1 .total-column {
-    /* width: 100px; */
-   width: 45px;
+   width: 100px;
+   /* width: 45px; */
 }
 
 .timetable-table-2 {
-    /* margin-left: 505px; */
-    margin-left: 450px;
+    margin-left: 505px;
+    /* margin-left: 450px; */
 }
 
 .timetable-table-1 td, .timetable-table-2 td {
@@ -50,8 +50,8 @@ body {
 }
 
 .timetable-table-2 td {
-    width: 45px;
-    /* width: 90px; */
+    /* width: 45px; */
+    width: 90px;
     position: relative;
 }
 
@@ -63,8 +63,8 @@ body {
 }
 
 .secondTableContainer {
-    /* width: 3500px; */
-    width: 2000px;
+    width: 3500px;
+    /* width: 2000px; */
 }
 
 
@@ -75,8 +75,8 @@ body {
 /* */
 
 .dayCellInput {
-    /* width: 80px; */
-    width: 40px;
+    width: 80px;
+    /* width: 40px; */
 }
 
 .employmentTypesList {
@@ -110,4 +110,17 @@ body {
 .dropDownContainer {
     float: right;
     margin-right: 25px;
+}
+
+.my-btn {
+    color: #337ab7 !important;
+}
+
+.timetable-button-container {
+    float: right;
+    margin: 30px;
+}
+
+.monthSelect, .yearSelect {
+    padding: 3px;
 }

@@ -26,11 +26,9 @@ $listUrl = Url::to([$controllerName .  "/list"]);
     }
 </style>
 
-<form ng-submit="save($event)" >
+<form ng-submit="save($event)" id="timetableForm" >
     <!-- <button type="button" class="btn btn-primary" >Сохранить</button> -->
     
-    <br/>
-    Дата: <input type="text" class="dateInput" name="Model[create_date]" ng-model="timetableModel.create_date" required /> <br/><br/>
     
     Месяц:
     <select name="Model[month]" required  class="monthSelect" ng-model="timetableModel.month" ng-change="updateDays()" convert-to-number >
@@ -41,19 +39,24 @@ $listUrl = Url::to([$controllerName .  "/list"]);
     <select name="Model[year]" required  class="yearSelect" ng-model="timetableModel.year" ng-change="updateDays()" convert-to-number >
         <option ng-repeat='year in years' value='{{year}}' >{{year}}</option>
     </select>
+    
+    &nbsp;&nbsp;
+    
+    Дата: <input type="text" class="dateInput" name="Model[create_date]" ng-model="timetableModel.create_date" required />
     <br/><br/>
     
     Подразделение: 
     <select name="Model[unit_id]" required ng-model="timetableModel.unit_id" convert-to-number >
         <option ng-repeat='unit in units' value='{{unit.unit_id}}' >{{unit.name}}</option>
     </select> <br/>
-    Максимальное количество видов времени на одну дату: <input class="countRowsInput" type="number" ng-change="changeCountRows()" ng-model="timetableModel.count_rows_on_day" />
+    <div style="display: none;">
+        Максимальное количество видов времени на одну дату: <input class="countRowsInput" type="number" ng-change="changeCountRows()" ng-model="timetableModel.count_rows_on_day" />
+    </div>
     <br/> <br/> 
     
-    <input type="submit" class="btn btn-primary" value="Сохранить" /> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    
     <input type="hidden" class="csrfInput" name="<?= Yii::$app->getRequest()->csrfParam ?>" value="<?= Yii::$app->getRequest()->getCsrfToken() ?>" />
-    <a class="btn btn-default" href="<?= $listUrl ?>" >Отмена</a>
-    <!-- <input type="submit" name="submit" value="Добавить" /> -->
+    
 </form>
 
 <br/><br/>
@@ -69,7 +72,7 @@ $listUrl = Url::to([$controllerName .  "/list"]);
 <div class="tableContainer">
     <div class="secondTableContainer">
         <table class="table table-bordered timetable-table-1">
-            <tr>
+            <tr class="active">
                 <td class="number-column">№</td>
                 <td class="worker-column" width="300" >Сотрудник</td>
                 <td class="total-column" width="200" >Итого</td>
@@ -99,13 +102,13 @@ $listUrl = Url::to([$controllerName .  "/list"]);
                         </div>
                     </td>
                     <!-- итого -->
-                    <td><div ng-if="rowIndex === 0" title="{{getTotalText(timetableWorkerIndex)}}">{{getPartTotalText(timetableWorkerIndex)}}</div></td>
+                    <td class="active"><div ng-if="rowIndex === 0" title="{{getTotalText(timetableWorkerIndex)}}">{{getPartTotalText(timetableWorkerIndex)}}</div></td>
                 </tr>
             </tbody>
         </table>
         
         <table class="table table-bordered timetable-table-2">
-            <tr>
+            <tr class="active">
                 <td ng-repeat="day in days" ng-class="(day.holiday) ? 'holiday' : '' ">{{day.dayOfMonth}}&nbsp;{{day.dayOfWeekName}}</td>
             </tr>
             <tbody ng-repeat="(timetableWorkerIndex, timetable_worker) in getDaysInfoArray()">
@@ -125,6 +128,11 @@ $listUrl = Url::to([$controllerName .  "/list"]);
         </table>
         
     </div>
+</div>
+
+<div class="timetable-button-container">
+    <input type="submit" class="btn btn-primary" value="Сохранить табель" form="timetableForm" /> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <a class="btn btn-default" href="<?= $listUrl ?>" form="timetableForm" >Закрыть</a>
 </div>
 
 <div class="modal fade" id="myModal" tabindex="-1" role="dialog">

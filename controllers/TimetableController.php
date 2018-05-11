@@ -92,6 +92,9 @@ class TimetableController extends Controller
     }
     
     public function actionList() {
+        $isGuest = Yii::$app->user->isGuest;   
+        $userId = Yii::$app->user->id;
+        
         $list = $this->getList(); 
         foreach ($list as $model) {
             $this->beforeOutput($model);
