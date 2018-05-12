@@ -43,6 +43,10 @@ body {
     height: 35px;
 }
 
+.timetable-table-1 .active, .timetable-table-2 .active {
+    font-weight: bold;
+}
+
 .timetable-table-2 {
     width: auto !important;
     table-layout: fixed !important;

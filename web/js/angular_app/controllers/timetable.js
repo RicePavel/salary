@@ -88,7 +88,7 @@ myApp.controller('timetableController', function($scope, $http, $timeout) {
     $scope.getPartTotalText = function (timetableWorkerIndex) {
         var str = $scope.getTotalText(timetableWorkerIndex);
         if (str.length > 7) {
-            str = str.substring(0, 3) + '...';
+            str = str.substring(0, 7) + '...';
         }
         return str;
     };
@@ -105,6 +105,10 @@ myApp.controller('timetableController', function($scope, $http, $timeout) {
     $scope.getDaysInfoArray = function() {
         var daysInfoArray = daysInfoKeeper.getDaysInfoArray();
         return daysInfoArray;
+    };
+    
+    $scope.addEmptyTimetableWorker = function() {
+       daysInfoKeeper.addTimetableWorker('', '', $scope.timetableModel.count_rows_on_day); 
     };
     
     $scope.addTimetableWorker = function() {
@@ -124,6 +128,8 @@ myApp.controller('timetableController', function($scope, $http, $timeout) {
             alert('выберите пользователя!');
         }
     };
+    
+    
     
     $scope.deleteTimetableWorker = function(index) {
         if (confirm('подтвердите удаление')) {

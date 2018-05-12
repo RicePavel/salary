@@ -39,8 +39,16 @@ class TimetableController extends Controller
         return $this->error;
     }
     
-    private function getList() {
-       return Timetable::find()->with('unit')->all(); 
+    private function getList($orderColumn = '', $orderType = 'ASC') {
+       //return Timetable::find()->with('unit')->all();  
+       //$sql = "SELECT * FROM timetable ";
+       $sql = "SELECT * FROM timetable left join unit on timetable.unit_id = unit.unit_id "; 
+       if ($orderColumn) {
+           $sql .= ' order by ' . $orderColumn . ' ' . $orderType;
+           //$sql .= ' order by :orderColumn :orderType ';
+       }
+       return Timetable::findBySql($sql)->with('unit')->all();  
+       //return Timetable::findBySql($sql, array('orderColumn' => $orderColumn, 'orderType' => $orderType))->with('unit')->all(); 
     }
     
     private function getMonths() {
@@ -95,7 +103,19 @@ class TimetableController extends Controller
         $isGuest = Yii::$app->user->isGuest;   
         $userId = Yii::$app->user->id;
         
-        $list = $this->getList(); 
+        $orderColumn = Yii::$app->request->get("orderColumn");
+        if ($orderColumn) {
+            $oldOrderType = Yii::$app->session->get("orderType");
+            $orderType = 'ASC';
+            if ($oldOrderType === 'ASC') {
+                $orderType = 'DESC';
+            }
+            $list = $this->getList($orderColumn, $orderType);
+            Yii::$app->session->set("orderType", $orderType);
+        } else {
+            $list = $this->getList();
+            Yii::$app->session->remove("orderType");
+        }
         foreach ($list as $model) {
             $this->beforeOutput($model);
         }

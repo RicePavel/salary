@@ -14,9 +14,9 @@ $addUrl = Url::to([$controllerName . "/add", 'type' => 'showAddAjaxForm']);
 
 <table class="table">
     <tr class="active">
-        <th>Дата</th>
+        <th><a href="<?= Url::to(["timetable/list", 'orderColumn' => 'create_date']) ?>">Дата</a></th>
         <th>Период регистрации</th>
-        <th>Подразделение</th>
+        <th><a href="<?= Url::to(["timetable/list", 'orderColumn' => 'unit.name']) ?>" >Подразделение</a></th>
         <th></th>
         <th></th>
     </tr>

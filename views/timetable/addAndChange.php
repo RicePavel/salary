@@ -61,12 +61,12 @@ $listUrl = Url::to([$controllerName .  "/list"]);
 
 <br/><br/>
 
-<button type="button" class="btn btn-default" data-toggle="modal" data-target="#myModal" ><span class="glyphicon glyphicon-plus"></span> &nbsp; Добавить пользователя</button>
+<!-- кнопка добавления пользователя с появлением всплывающего окна. Сейчас не используется. -->
+<button style="display: none;" type="button" class="btn btn-default" data-toggle="modal" data-target="#myModal" ><span class="glyphicon glyphicon-plus"></span> &nbsp; Добавить пользователя</button>
+
+<button type="button" class="btn btn-default" ng-click="addEmptyTimetableWorker()" ><span class="glyphicon glyphicon-plus"></span> &nbsp; Добавить пользователя</button>
 
 <br/>
-
-<!-- deprecated -->
-
 
 
 <div class="tableContainer">
