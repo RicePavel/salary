@@ -29,12 +29,35 @@ class PositionController extends Controller
         return $this->error;
     }
     
-    private function getList() {
-       return Position::find()->all(); 
+    private function getList($orderColumn = '', $orderType = 'ASC') {
+       $sql = "SELECT * FROM position"; 
+       if ($orderColumn) {
+           $sql .= ' order by ' . $orderColumn . ' ' . $orderType;
+       }
+       return Position::findBySql($sql)->all();
+       //return Position::find()->all(); 
     }
     
     public function actionList() {
-        $list = $this->getList(); 
+        //$list = $this->getList(); 
+        
+        $orderColumn = Yii::$app->request->get("orderColumn");
+        if ($orderColumn) {
+            $oldOrderType = Yii::$app->session->get("position_orderType");
+            $oldOrderColumn = Yii::$app->session->get("position_orderColumn");
+            $orderType = 'ASC';
+            if ($oldOrderType === 'ASC' && $oldOrderColumn === $orderColumn) {
+                $orderType = 'DESC';
+            }
+            $list = $this->getList($orderColumn, $orderType);
+            Yii::$app->session->set("position_orderType", $orderType);
+            Yii::$app->session->set("position_orderColumn", $orderColumn);
+        } else {
+            $list = $this->getList();
+            Yii::$app->session->remove("position_orderType");
+            Yii::$app->session->remove("position_orderColumn");
+        }
+        
         return $this->render("list", ["list" => $list]);
     }
     

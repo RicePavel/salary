@@ -48,6 +48,9 @@ AppAsset::register($this);
     <script src="js/angular_app/main.js" ></script>
     <script src="js/angular_app/controllers/timetable.js"></script>
     
+    <link rel="stylesheet" href="css/table-resize.css">
+    <script src="js/table-resize.js"></script>
+    
     <script>
   $( function() {
     $( "#datepicker" ).datepicker();

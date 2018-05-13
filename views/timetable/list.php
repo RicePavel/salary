@@ -12,13 +12,19 @@ $addUrl = Url::to([$controllerName . "/add", 'type' => 'showAddAjaxForm']);
 <h2>Табели учета рабочего времени</h2> <br/> <br/>
 <a class="btn btn-default my-btn" href="<?= $addUrl ?>" >Добавить </a> <br/><br/>
 
-<table class="table">
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        new TableResize(document.getElementById('timetableTable'), {restoreState: true, fixed: true});
+    });
+</script>
+
+<table class="table table-bordered" id="timetableTable">
     <tr class="active">
         <th><a href="<?= Url::to(["timetable/list", 'orderColumn' => 'create_date']) ?>">Дата</a></th>
-        <th>Период регистрации</th>
+        <th><a href="<?= Url::to(["timetable/list", 'orderColumn' => 'period']) ?>">Период регистрации</a></th>
         <th><a href="<?= Url::to(["timetable/list", 'orderColumn' => 'unit.name']) ?>" >Подразделение</a></th>
-        <th></th>
-        <th></th>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
     </tr>
     <?php foreach ($list as $elem) {
         $changeUrl = Url::to([$controllerName . "/change", $primaryKeyName => $elem->$primaryKeyName, 'type' => 'showAjaxForm']);

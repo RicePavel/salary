@@ -40,15 +40,16 @@ class TimetableController extends Controller
     }
     
     private function getList($orderColumn = '', $orderType = 'ASC') {
-       //return Timetable::find()->with('unit')->all();  
-       //$sql = "SELECT * FROM timetable ";
        $sql = "SELECT * FROM timetable left join unit on timetable.unit_id = unit.unit_id "; 
+       
        if ($orderColumn) {
+           if ($orderColumn === 'period') {
+               $orderColumn = 'year, month';
+           }
            $sql .= ' order by ' . $orderColumn . ' ' . $orderType;
-           //$sql .= ' order by :orderColumn :orderType ';
        }
-       return Timetable::findBySql($sql)->with('unit')->all();  
-       //return Timetable::findBySql($sql, array('orderColumn' => $orderColumn, 'orderType' => $orderType))->with('unit')->all(); 
+        
+       return Timetable::findBySql($sql)->with('unit')->all(); 
     }
     
     private function getMonths() {
@@ -105,16 +106,19 @@ class TimetableController extends Controller
         
         $orderColumn = Yii::$app->request->get("orderColumn");
         if ($orderColumn) {
-            $oldOrderType = Yii::$app->session->get("orderType");
+            $oldOrderType = Yii::$app->session->get("timetable_orderType");
+            $oldOrderColumn = Yii::$app->session->get("timetable_orderColumn");
             $orderType = 'ASC';
-            if ($oldOrderType === 'ASC') {
+            if ($oldOrderType === 'ASC' && $oldOrderColumn === $orderColumn) {
                 $orderType = 'DESC';
             }
             $list = $this->getList($orderColumn, $orderType);
-            Yii::$app->session->set("orderType", $orderType);
+            Yii::$app->session->set("timetable_orderType", $orderType);
+            Yii::$app->session->set("timetable_orderColumn", $orderColumn);
         } else {
             $list = $this->getList();
-            Yii::$app->session->remove("orderType");
+            Yii::$app->session->remove("timetable_orderType");
+            Yii::$app->session->remove("timetable_orderColumn");
         }
         foreach ($list as $model) {
             $this->beforeOutput($model);

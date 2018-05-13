@@ -213,7 +213,7 @@ myApp.controller('timetableController', function($scope, $http, $timeout) {
     
     $scope.down = function(index) {
         daysInfoKeeper.down(index);
-    }
+    };
     
     /* ------------------------------------- */
     /* ------------------------------------- */
@@ -228,11 +228,11 @@ myApp.controller('timetableController', function($scope, $http, $timeout) {
         } else {
             return false;
         }
-    }
+    };
     
     $scope.showEmploymentTypesList = function(timetableWorkerIndex, rowIndex, day) {
         return ($scope.cellEdited(timetableWorkerIndex, rowIndex, day) && $scope.editableModel.showEmploymentTypesList);
-    }
+    };
     
     $scope.editCell = function(timetableWorkerIndex, rowIndex, day, event) {
         $scope.editableModel.nowEdited = true;

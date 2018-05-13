@@ -9,16 +9,22 @@ $addUrl = Url::to([$controllerName . "/add"]);
 
 ?>
 
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        new TableResize(document.getElementById('employmentTypeTable'), {restoreState: true, fixed: true});
+    });
+</script>
+
 <div class="employmentTypeContainer"> 
     <h2>Виды рабочего времени</h2> <br/> <br/>
     <a href="<?= $addUrl ?>" class="addLink btn btn-default my-btn">Добавить </a> <br/><br/>
 
-    <table class="table">
+    <table class="table table-bordered" id="employmentTypeTable">
         <tr class="active">
-            <th>Сокращение</th>
-            <th>Наименование</th>
-            <th></th>
-            <th></th>
+            <th><a href="<?= Url::to(["employment-type/list", 'orderColumn' => 'short_name']) ?>">Сокращение</a></th>
+            <th><a href="<?= Url::to(["employment-type/list", 'orderColumn' => 'name']) ?>">Наименование</a></th>
+            <th>&nbsp;</th>
+            <th>&nbsp;</th>
         </tr>
         <?php foreach ($list as $elem) {
             $changeUrl = Url::to([$controllerName . "/change", $primaryKeyName => $elem->$primaryKeyName]);

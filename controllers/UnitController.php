@@ -29,8 +29,16 @@ class UnitController extends Controller
         return $this->error;
     }
     
-    private function getList() {
-       $units = Unit::find()->all();
+    private function getList($orderColumn = '', $orderType = 'ASC') {
+       
+       $sql = "SELECT * FROM unit"; 
+       if ($orderColumn) {
+           $sql .= ' order by ' . $orderColumn . ' ' . $orderType;
+       }
+       $units = Unit::findBySql($sql)->all();
+        
+       //$units = Unit::find()->all();
+       
        $unitsArray = [];
        foreach ($units as $unit) {
            $unitsArray[$unit->unit_id] = $unit;
@@ -53,7 +61,25 @@ class UnitController extends Controller
     }
     
     public function actionList() {
-        $list = $this->getList(); 
+        //$list = $this->getList(); 
+        
+        $orderColumn = Yii::$app->request->get("orderColumn");
+        if ($orderColumn) {
+            $oldOrderType = Yii::$app->session->get("unit_orderType");
+            $oldOrderColumn = Yii::$app->session->get("unit_orderColumn");
+            $orderType = 'ASC';
+            if ($oldOrderType === 'ASC' && $oldOrderColumn === $orderColumn) {
+                $orderType = 'DESC';
+            }
+            $list = $this->getList($orderColumn, $orderType);
+            Yii::$app->session->set("unit_orderType", $orderType);
+            Yii::$app->session->set("unit_orderColumn", $orderColumn);
+        } else {
+            $list = $this->getList();
+            Yii::$app->session->remove("unit_orderType");
+            Yii::$app->session->remove("unit_orderColumn");
+        }
+        
         return $this->render("list", ["list" => $list]);
     }
     

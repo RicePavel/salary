@@ -9,15 +9,21 @@ $addUrl = Url::to(["position/add"]);
 
 ?>
 
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        new TableResize(document.getElementById('positionTable'), {restoreState: true, fixed: true});
+    });
+</script>
+
 <div class="positionContainer">
     <h2>Должности</h2> <br/> <br/>
     <a href="<?= $addUrl ?>" class="addLink btn btn-default my-btn">Добавить </a> <br/><br/>
 
-    <table class="table">
+    <table class="table table-bordered" id="positionTable">
         <tr class="active">
-            <th>Наименование</th>
-            <th></th>
-            <th></th>
+            <th><a href="<?= Url::to(["position/list", 'orderColumn' => 'name']) ?>">Наименование</a></th>
+            <th>&nbsp;</th>
+            <th>&nbsp;</th>
         </tr>
         <?php foreach ($list as $elem) {
             $changeUrl = Url::to([$controllerName . "/change", $primaryKeyName => $elem->$primaryKeyName]);

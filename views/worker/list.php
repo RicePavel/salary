@@ -10,20 +10,26 @@ $addUrl = Url::to([$controllerName . "/add"]);
 
 ?>
 
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        new TableResize(document.getElementById('workerTable'), {restoreState: true, fixed: true});
+    });
+</script>
+
 <div class="workerContainer">
     <h2>Сотрудники</h2> <br/> <br/>
     <a class="btn btn-default my-btn" href="<?= $addUrl ?>" class="addLink" >Добавить </a> <br/><br/>
 
-    <table class="table">
+    <table class="table table-bordered" id="workerTable">
         <tr class="active">
-            <th>ФИО</th>
-            <th>Табельный номер</th>
-            <th>Должность</th>
-            <th>Подразделение</th>
-            <th>Код из 1С</th>
+            <th><a href="<?= Url::to(["worker/list", 'orderColumn' => 'fio']) ?>">ФИО</a></th>
+            <th><a href="<?= Url::to(["worker/list", 'orderColumn' => 'person_number']) ?>">Табельный номер</a></th>
+            <th><a href="<?= Url::to(["worker/list", 'orderColumn' => 'position.name']) ?>">Должность</a></th>
+            <th><a href="<?= Url::to(["worker/list", 'orderColumn' => 'unit.name']) ?>">Подразделение</a></th>
+            <th><a href="<?= Url::to(["worker/list", 'orderColumn' => 'code_1c']) ?>">Код из 1С</a></th>
             <th>Вид занятости</th>
-            <th></th>
-            <th></th>
+            <th>&nbsp;</th>
+            <th>&nbsp;</th>
         </tr>
         <?php foreach ($list as $elem) {
             $changeUrl = Url::to([$controllerName . "/change", $primaryKeyName => $elem->$primaryKeyName]);

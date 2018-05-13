@@ -29,12 +29,35 @@ class EmploymentTypeController extends Controller
         return $this->error;
     }
     
-    private function getList() {
-       return Employment_type::find()->all(); 
+    private function getList($orderColumn = '', $orderType = 'ASC') {
+       $sql = "SELECT * FROM employment_type"; 
+       if ($orderColumn) {
+           $sql .= ' order by ' . $orderColumn . ' ' . $orderType;
+       }
+       return Employment_type::findBySql($sql)->all();
+       //return Employment_type::find()->all(); 
     }
     
     public function actionList() {
-        $list = $this->getList(); 
+        
+        $orderColumn = Yii::$app->request->get("orderColumn");
+        if ($orderColumn) {
+            $oldOrderType = Yii::$app->session->get("employment_type_orderType");
+            $oldOrderColumn = Yii::$app->session->get("employment_type_orderColumn");
+            $orderType = 'ASC';
+            if ($oldOrderType === 'ASC' && $oldOrderColumn === $orderColumn) {
+                $orderType = 'DESC';
+            }
+            $list = $this->getList($orderColumn, $orderType);
+            Yii::$app->session->set("employment_type_orderType", $orderType);
+            Yii::$app->session->set("employment_type_orderColumn", $orderColumn);
+        } else {
+            $list = $this->getList();
+            Yii::$app->session->remove("employment_type_orderType");
+            Yii::$app->session->remove("employment_type_orderColumn");
+        }
+        
+        //$list = $this->getList(); 
         return $this->render("list", ["list" => $list]);
     }
     

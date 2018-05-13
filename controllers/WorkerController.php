@@ -34,8 +34,14 @@ class WorkerController extends Controller
         return $this->error;
     }
     
-    private function getList() {
-       return Worker::find()->with("position")->with("unit")->all(); 
+    private function getList($orderColumn = '', $orderType = 'ASC') {
+       //return Worker::find()->with("position")->with("unit")->all(); 
+        
+       $sql = "SELECT * FROM worker left join unit on worker.unit_id = unit.unit_id left join position on worker.position_id = position.position_id "; 
+       if ($orderColumn) {
+           $sql .= ' order by ' . $orderColumn . ' ' . $orderType;
+       }
+       return Worker::findBySql($sql)->with('position')->with('unit')->all(); 
     }
     
     private function getPositions() {
@@ -64,7 +70,24 @@ class WorkerController extends Controller
             $list = $this->getList();
             $this->sendInJson($list);
         } else {
-            $list = $this->getList(); 
+            
+            $orderColumn = Yii::$app->request->get("orderColumn");
+            if ($orderColumn) {
+                $oldOrderType = Yii::$app->session->get("worker_orderType");
+                $oldOrderColumn = Yii::$app->session->get("worker_orderColumn");
+                $orderType = 'ASC';
+                if ($oldOrderType === 'ASC' && $oldOrderColumn === $orderColumn) {
+                    $orderType = 'DESC';
+                }
+                $list = $this->getList($orderColumn, $orderType);
+                Yii::$app->session->set("worker_orderType", $orderType);
+                Yii::$app->session->set("worker_orderColumn", $orderColumn);
+            } else {
+                $list = $this->getList();
+                Yii::$app->session->remove("worker_orderType");
+                Yii::$app->session->remove("worker_orderColumn");
+            }
+            
             return $this->render("list", ["list" => $list]);
         }
     }

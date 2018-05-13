@@ -9,15 +9,21 @@ $addUrl = Url::to([$controllerName . "/add"]);
 
 ?>
 
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        new TableResize(document.getElementById('unitTable'), {restoreState: true, fixed: true});
+    });
+</script>
+
 <div class="unitContainer">
     <h2>Подразделения</h2> <br/> <br/>
     <a href="<?= $addUrl ?>" class="addLink btn btn-default my-btn" >Добавить </a> <br/><br/>
 
-    <table class="table">
+    <table class="table table-bordered" id="unitTable">
         <tr class="active">
-            <th>Наименование</th>
-            <th></th>
-            <th></th>
+            <th><a href="<?= Url::to(["unit/list", 'orderColumn' => 'name']) ?>">Наименование</a></th>
+            <th>&nbsp;</th>
+            <th>&nbsp;</th>
         </tr>
         <?= renderUnits($list, 0, $controllerName, $primaryKeyName) ?>
     </table>

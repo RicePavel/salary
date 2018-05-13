@@ -128,3 +128,7 @@ body {
 .monthSelect, .yearSelect {
     padding: 3px;
 }
+
+#timetableTable th, #workerTable th, #positionTable th, #unitTable th, #employmentTypeTable th {
+    padding-right: 0 !important;
+}
