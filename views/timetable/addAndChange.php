@@ -83,10 +83,12 @@ $listUrl = Url::to([$controllerName .  "/list"]);
                     <td>{{$index == 0 ? $parent.$index + 1 : ''}}</td>
                     <!-- сотрудник -->
                     <td class="workerTd" >
+                        
                         <span class="workerFio">{{$index == 0 ? timetable_worker.fio : ''}}</span>
                         <select style="display: none;" class="workerFioSelect" ng-if="rowIndex === 0" ng-change="changeWorker(timetableWorkerIndex, getDaysInfoArray()[timetableWorkerIndex].worker_id)" ng-model="getDaysInfoArray()[timetableWorkerIndex].worker_id" convert-to-number >
                             <option ng-repeat="worker in workers" value="{{worker.worker_id}}" >{{worker.fio}}</option>
                         </select>
+                        
                         
                         
                         <div class="dropdown dropDownContainer" ng-if="rowIndex === 0" class="dropdown">
