@@ -9,6 +9,7 @@ use yii\web\Response;
 use yii\filters\VerbFilter;
 use app\models\LoginForm;
 use app\models\ContactForm;
+use app\models\User;
 use yii\helpers\Url;
 
 class SiteController extends Controller
@@ -80,17 +81,23 @@ class SiteController extends Controller
         }
 
         $model = new LoginForm();
+        /*
         if ($model->load(Yii::$app->request->post()) && $model->login()) {
-            //return $this->goBack();
             $this->redirect(Url::to(["/timetable/list"]));
+        }
+         */
+        if ($model->load(Yii::$app->request->post())) {
+            $username = $model->username;
+            $password = $model->password;
+            $hash = md5($password);
+            $user = User::findOne(['username' => $username, 'password' => $hash]);
+            if ($user !== null) {
+                Yii::$app->user->login($user, 3600*24*30);
+                $this->redirect(Url::to(["/timetable/list"]));
+            }
         }
 
         $model->password = '';
-        /*
-        return $this->renderPartial('login', [
-            'model' => $model,
-        ]);
-         */
         return $this->render('login', [
             'model' => $model,
         ]);
