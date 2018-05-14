@@ -94,15 +94,30 @@ body {
     background-color: white;
 }
 
-.employmentTypesList li {
+.employmentTypesList li, .workersList li {
     list-style-type: none;
     cursor: pointer;
     margin-left: 0;
     padding-left: 0;
 }
 
-.employmentTypesList li:hover {
+.employmentTypesList li:hover, .workersList li:hover {
     background-color: #F4FF77;
+}
+
+.timetableWorkerSelectContainer {
+    display: none;
+    position: relative;
+    float: left;
+    width: 300px;
+}
+
+.workersList {
+    position: absolute;
+    padding: 0;
+    z-index:10;
+    background-color: white;
+    border: 1px solid black;
 }
 
 .countRowsInput {

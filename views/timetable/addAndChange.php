@@ -89,7 +89,12 @@ $listUrl = Url::to([$controllerName .  "/list"]);
                             <option ng-repeat="worker in workers" value="{{worker.worker_id}}" >{{worker.fio}}</option>
                         </select>
                         
-                        
+                        <div class="timetableWorkerSelectContainer"> 
+                            <input type="text" class="timetableWorkerInput" />
+                            <ul class="workersList">
+                                <li class="workersListLi" ng-repeat="worker in workers" ng-click="changeWorkerAndCloseSelect(timetableWorkerIndex, worker.worker_id, $event)" data-id="{{worker.worker_id}}" >{{worker.fio}}</li>
+                            </ul>
+                        </div>
                         
                         <div class="dropdown dropDownContainer" ng-if="rowIndex === 0" class="dropdown">
                             <button id="dLabel" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="btn btn-default btn-xs" >

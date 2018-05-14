@@ -184,6 +184,17 @@ myApp.controller('timetableController', function($scope, $http, $timeout) {
         daysInfoKeeper.setWorker(timetableWorkerIndex, workerId, fio);
     };
     
+    $scope.changeWorkerAndCloseSelect = function(timetableWorkerIndex, workerId, event) {
+        $scope.changeWorker(timetableWorkerIndex, workerId);
+        var li = $(event.target);
+        var td = li.closest("td");
+        var div = td.find('.workerFio');
+        var selectDiv = td.find('.timetableWorkerSelectContainer');
+        div.show();
+        selectDiv.hide();
+    };
+    
+    /*
     $('body').on('dblclick', '.workerTd', function(event) {
         var target = $(event.target);
         if (target.prop("tagName") !== "BUTTON") {
@@ -204,7 +215,53 @@ myApp.controller('timetableController', function($scope, $http, $timeout) {
             $(document).click(finishEditing);
         }
     });
-    
+    */
+   
+   $('body').on('dblclick', '.workerTd', function(event) {
+       var target = $(event.target);
+       if (target.prop("tagName") !== "BUTTON") {
+           var td = $(event.currentTarget);
+           var div = td.find('.workerFio');
+           var selectDiv = td.find('.timetableWorkerSelectContainer');
+           var input = td.find(".timetableWorkerInput");
+           var fioSpan = td.find(".workerFio");
+           input.val(fioSpan.text());
+           var ul = selectDiv.find('ul');
+           filterList(ul, input.val());
+           div.hide();
+           selectDiv.show();
+           var finishEditing = function(event) {
+               var target = $(event.target);
+               if (!target.hasClass('timetableWorkerInput') && !target.hasClass('workersList') && !target.hasClass('workersListLi')) {
+                   div.show();
+                   selectDiv.hide();
+                   $(document).off('click', finishEditing);
+               }
+           };
+           $(document).click(finishEditing);
+       }
+   });
+   
+   $('body').on('input', '.timetableWorkerInput', function(event) {
+       var target = $(event.target);
+       var td = target.closest('td');
+       var value = target.val();
+       var ul = td.find('.workersList');
+       filterList(ul, value);
+   });
+   
+   function filterList(ul, value) {
+       ul.find('li').each(function(indx, domElement) {
+           var elem = $(domElement);
+           var elementText = elem.text();
+           if (elementText.toLowerCase().indexOf(value.toLowerCase()) === -1) {
+               elem.hide();
+           } else {
+               elem.show();
+           }
+       });
+   };
+   
     /** перемещение вверх и вниз */
     
     $scope.up = function(index) {
