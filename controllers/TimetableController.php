@@ -294,7 +294,7 @@ class TimetableController extends Controller
         
         foreach ($timetableModel->timetable_workers as $timetableWorkerModel) {
             $timetableWorker = ['worker_id' => $timetableWorkerModel->worker_id, 
-                'fio' => $timetableWorkerModel->worker->fio,
+                'fio' => ($timetableWorkerModel->worker ? $timetableWorkerModel->worker->fio : ''),
                 'rows' => []];
             foreach ($timetableWorkerModel->timetable_rows as $rowModel) {
                 $row = ['days' => []];
