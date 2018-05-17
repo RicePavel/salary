@@ -34,7 +34,7 @@ $addUrl = Url::to(["position/add"]);
             <td> <a href="<?= $changeUrl ?>" class="changeLink btn btn-default my-btn" data-id="<?= $elem->position_id ?>" >Изменить</a> </td>
             <td> <form onsubmit="return confirm('Подтвердите удаление')" action="<?= $deleteUrl ?>" method="POST" >
                     <input type="hidden" name="<?= Yii::$app->getRequest()->csrfParam ?>" value="<?= Yii::$app->getRequest()->getCsrfToken() ?>" />
-                    <input type="submit" value="удалить" class="btn btn-default my-btn" />
+                    <input type="submit" value="Удалить" class="btn btn-default my-btn" />
                 </form> 
             </td>
         </tr>

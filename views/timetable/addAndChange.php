@@ -46,20 +46,18 @@ $listUrl = Url::to([$controllerName .  "/list"]);
     <br/><br/>
     
     Подразделение: 
-    <select name="Model[unit_id]" required ng-model="timetableModel.unit_id" convert-to-number >
+    <select name="Model[unit_id]" class="unitsSelect" required ng-model="timetableModel.unit_id" convert-to-number >
         <option ng-repeat='unit in units' value='{{unit.unit_id}}' >{{unit.name}}</option>
-    </select> <br/>
+    </select> 
     <div style="display: none;">
         Максимальное количество видов времени на одну дату: <input class="countRowsInput" type="number" ng-change="changeCountRows()" ng-model="timetableModel.count_rows_on_day" />
     </div>
-    <br/> <br/> 
-    
     
     <input type="hidden" class="csrfInput" name="<?= Yii::$app->getRequest()->csrfParam ?>" value="<?= Yii::$app->getRequest()->getCsrfToken() ?>" />
     
 </form>
 
-<br/><br/>
+<br/>
 
 <!-- кнопка добавления пользователя с появлением всплывающего окна. Сейчас не используется. -->
 <button style="display: none;" type="button" class="btn btn-default" data-toggle="modal" data-target="#myModal" ><span class="glyphicon glyphicon-plus"></span> &nbsp; Добавить пользователя</button>
